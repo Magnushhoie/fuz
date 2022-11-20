@@ -14,7 +14,7 @@
   <h1 align="center">fuz</h3>
 
   <p align="center">
-    File fuzzy finder, built with FZF, ripgrep and bat
+    Terminal-based, file fuzzy finder for ultra-fast text editing
   </p>
 </p>
 

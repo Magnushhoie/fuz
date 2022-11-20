@@ -23,43 +23,21 @@
 <img src="img/image.jpg" alt="Logo" width="700">
 </p>
 
-
-
-## Installation
-
-```bash
-# Requirements
-brew install fzf
-brew install rg
-brew install bat
-
-# Install
-git clone https://github.com/Magnushhoie/fuz/
-cd fuz
-chmod +x fuz
-
-# Add to .bashrc / .zshrc
-NOTESDIR=$(realpath notes/)
-echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
-echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes
-echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes
-```
-
 ## Usage
 
 ```
 Usage: fuz [-h] [-e] [-n] [-v]
       -d DEPTH -p PATH
-      [search_pattern]
+      [filename]
 
-Interactively search file names and contents, open selected file
+Interactively search filenames and contents, open with vim/less
 
 Examples:
 - Search file-contents from current directory, open with less:
-    fuz "search_pattern"
-- Search filenames from current directory, open with vim:
-    fuz -n -e "search_pattern"
-- Search folder notes/ for pattern "bash":
+    fuz
+- Search filenames (-n) from current directory, edit with vim (-e):
+    fuz -n -e
+- Open file bash in notes/
     fuz -p notes/ bash
 
 Available options:
@@ -71,6 +49,43 @@ Available options:
 -s, --setup     Setup search aliases for specific directory # TODO
 -v, --verbose   Verbose printing # TODO
 ```
+
+## Installation
+
+```bash
+git clone https://github.com/Magnushhoie/fuz/
+cd fuz
+chmod +x fuz
+
+# Add to .bashrc / .zshrc
+NOTESDIR=$(realpath notes/)
+echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
+echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes
+echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes
+```
+
+## Requirements
+
+```bash
+# MacOS
+brew install fzf
+brew install rg
+brew install bat
+
+# Conda
+conda install -c conda-forge fzf
+conda install -c conda-forge ripgrep
+conda install -c conda-forge bat
+
+# Ubuntu
+sudo apt-get install fzf
+sudo apt-get install ripgrep
+sudo apt install bat
+```
+
+- [fzf](https://github.com/junegunn/fzf)
+- [ripgrep](https://github.com/BurntSushi/ripgrep) 
+- [bat](https://github.com/sharkdp/bat)
 
 ## Compatibility
 Compatible with zsh. Tested on MacOS Mojave/Big Sur and Ubuntu 21.04.

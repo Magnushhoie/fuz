@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+#
+# Fuz: File fuzzy finder, based on FZF
+
+# 1. section: global constants
+# set -o errexit
+set -o nounset
+set -o pipefail
+if [[ "${TRACE-0}" == "1" ]]; then
+    # debug mode, run TRACE=1 ./fuz.sh
+    set -o xtrace
+fi
+
+declare -r SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" || die "Error SCRIPTPATH" > /dev/null; pwd -P )"
+declare -r STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
+declare -r IFS=""
+
+# FZF defaults
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
+export FZF_DEFAULT_OPTS="--reverse --inline-info --ansi"
+
+# 2. section: functions
+function usage() {
+cat << EOF #
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
+      -d DEPTH -p PATH
+      [search_pattern]
+
+Interactively search file names and contents, open selected file
+
+Examples:
+- Search file-contents from current directory, open with less:
+    fuz "search_pattern"
+- Search filenames from current directory, open with vim:
+    fuz -n -e "search_pattern"
+- Search folder notes/ for pattern "bash":
+    fuz -p notes/ bash
+
+Available options:
+-h, --help      Print this help and exit
+-d, --depth     Max search depth
+-e, --edit      Open with editor (vim) instead of less
+-n, --names     Search for filenames
+-p, --path      Search path
+-s, --setup     Setup search aliases for specific directory # TODO
+-v, --verbose   Verbose printing # TODO
+EOF
+  exit 1
+}
+
+# all progs need to be given as parameters
+function _check_required_programs() {
+  for p in "${@}"; do
+    hash "${p}" 2>&- || \
+        { msg " Required program \"${p}\" not installed or in search PATH.";
+                exit 1;
+              }
+    done
+}
+
+function msg() {
+  echo >&2 -e "${1-}"
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  msg "$msg"
+  exit "$code"
+}
+
+#######################################
+# Open file with vim or less at linenumber
+# Globals:
+#   file: File to open, fullpath
+#   linematch: Line number to open at
+#   edit: 1 for vim, 0 for less
+# Arguments:
+#   None
+#######################################
+function open_filematch() {
+  # First check if valid file
+  if [[ -f "$file" ]]; then
+    msg "$file"
+    if [[ $edit == 1 ]]; then
+      vim +":silent! normal g;" +":set nonu" +":set nohlsearch" +"${linematch:-0}" "$file"
+    else
+      less --RAW-CONTROL-CHARS --hilite-unread --ignore-case  --incsearch \
+      --quit-on-intr --QUIET \
+      +"${linematch:-0}" "$file"
+    fi 
+  fi
+  exit 0
+}
+
+function main() {
+
+  # Check requirements, ripgrep, fzf and bat
+  _check_required_programs fzf rg bat
+
+
+  # Parse params
+  edit='0' # e
+  depth='3' # d
+  names='0' # n
+  dir=$(realpath .) # p 
+  verbose='0' # v
+  while getopts 'hednp:v' flag; do
+    case "${flag}" in
+      h) usage ;;
+      e) edit='1' ;;
+      d) depth="${OPTARG}" shift ;;
+      n) names='1' ;;
+      p) dir=$(realpath "${OPTARG}") ;;
+      v) verbose='1' ;;
+      *) echo "Unexpected option ${flag}" ;;
+    esac
+  done 
+  shift $((OPTIND-1))
+  query="${*-}"
+  
+  # Main program
+  cd "$dir" || die "Error cd dir"
+
+
+  # Open matching file if search query contains single matching filename
+  # Null terminator required for files with whitespaces, stop after 2nd match
+  # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
+  files=()
+  while read -r -d $'\0'; do
+      files+=("$REPLY")
+  done < <(
+    find . -name "*$query*" -maxdepth 1 -print0 \
+      | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
+    )
+
+  if [[ "${#files[@]}" -eq 1 ]]; then
+    file=$(realpath "${files[0]}")
+    open_filematch
+  fi
+
+
+  # fuz -e: Fuzzy search filenames, open in vim
+  # Ripgrep for filenames
+  # Select with fzf exact search, select if 1 match
+  if [[ $names == 1 ]]; then
+    file=$(
+      rg "" --files-with-matches --max-depth $depth 2>/dev/null \
+        | fzf -e --select-1 --query "${query: }" --preview="bat --color=always {}"
+      )
+    open_filematch
+
+
+  # fuz: # Fuzzy search file-contents, open with less
+  # Ripgrep w/ line no. and names, ignoring binary files and .git
+  # Select with fzf exact search, select if 1 match
+  else
+    filematch=$(
+      rg "^\S" --color=always --no-heading --with-filename --line-number --max-depth $depth --max-columns 100 --max-filesize 2M 2>/dev/null \
+        | sed "s;$dir/;;" 2>/dev/null \
+        | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+      )
+
+    # Extract filename and linenumber from match
+    file=$(cut -d":" -f1 <<< "$filematch")
+    file="$dir/$file"
+    linematch=$(cut -d":" -f2 <<< "$filematch")
+
+    # Open with vim or less
+    open_filematch
+  fi 
+
+  exit 0
+}
+
+# this is the main executable function at end of script
+main "$@"

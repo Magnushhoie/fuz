@@ -23,7 +23,7 @@
 <img src="img/image.jpg" alt="Logo" width="700">
 </p>
 
-Fuz features:
+Features:
 - Search filenames with -n flag, otherwise file-contents
 - Opens files at selected line with less or vim (with -e flag)
 - If a single match is found, open/search that file

@@ -32,13 +32,17 @@ Usage: fuz [-h] [-e] [-n] [-v]
 
 Interactively search filenames and contents, open with vim/less
 
+
 Examples:
 - Search file-contents from current directory, open with less:
     fuz
+
 - Search filenames (-n) from current directory, edit (-e) with vim:
     fuz -n -e
+
 - Find file bash from path (-p) notes/
     fuz -p notes/ bash
+
 
 Available options:
 -h, --help      Print this help and exit
@@ -60,35 +64,34 @@ chmod +x fuz
 # Add to .bashrc / .zshrc
 NOTESDIR=$(realpath notes/)
 echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
-echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes
-echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes
+echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes/ directory
+echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes/ open in vim
 ```
 
 ## Requirements
-
 ```bash
 # MacOS
 brew install fzf
 brew install rg
 brew install bat
 
-# Conda
-conda install -c conda-forge fzf
-conda install -c conda-forge ripgrep
-conda install -c conda-forge bat
-
 # Ubuntu
 sudo apt-get install fzf
 sudo apt-get install ripgrep
 sudo apt install bat
+
+# Conda
+conda install -c conda-forge fzf
+conda install -c conda-forge ripgrep
+conda install -c conda-forge bat
 ```
 
 - [fzf](https://github.com/junegunn/fzf)
-- [ripgrep](https://github.com/BurntSushi/ripgrep) 
+- [ripgrep](https://github.com/BurntSushi/ripgrep)
 - [bat](https://github.com/sharkdp/bat)
 
 ## Compatibility
-Compatible with zsh. Tested on MacOS Mojave/Big Sur and Ubuntu 21.04.
+Compatible with bash 3.2+ and zsh 5.9+. Tested on MacOS Mojave/Big Sur and Ubuntu 21.04.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

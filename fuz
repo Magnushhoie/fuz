@@ -24,17 +24,9 @@ function usage() {
 cat << EOF #
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
       -d DEPTH -p PATH
-      [search_pattern]
+      [filename]
 
-Interactively search file names and contents, open selected file
-
-Examples:
-- Search file-contents from current directory, open with less:
-    fuz "search_pattern"
-- Search filenames from current directory, open with vim:
-    fuz -n -e "search_pattern"
-- Search folder notes/ for pattern "bash":
-    fuz -p notes/ bash
+Inteactively search filenames and contents, open with vim/less
 
 Available options:
 -h, --help      Print this help and exit
@@ -44,6 +36,17 @@ Available options:
 -p, --path      Search path
 -s, --setup     Setup search aliases for specific directory # TODO
 -v, --verbose   Verbose printing # TODO
+
+Examples:
+- Search file-contents from current directory, open with less:
+    fuz
+
+- Search filenames (-n) from current directory, edit (-e) with vim:
+    fuz -n -e
+
+- Find file bash from path (-p) notes/
+    fuz -p notes/ bash
+
 EOF
   exit 1
 }

@@ -40,7 +40,7 @@ Examples:
 - Search filenames (-n) from current directory, edit (-e) with vim:
     fuz -n -e
 
-- Find file bash from path (-p) notes/
+- Search file bash.sh from path (-p) notes/
     fuz -p notes/ bash
 
 

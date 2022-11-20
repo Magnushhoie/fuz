@@ -35,9 +35,9 @@ Interactively search filenames and contents, open with vim/less
 Examples:
 - Search file-contents from current directory, open with less:
     fuz
-- Search filenames (-n) from current directory, edit with vim (-e):
+- Search filenames (-n) from current directory, edit (-e) with vim:
     fuz -n -e
-- Open file bash in notes/
+- Find file bash from path (-p) notes/
     fuz -p notes/ bash
 
 Available options:

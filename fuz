@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 #
-# Fuz: File fuzzy finder, based on FZF
+# Fuz: Terminal-based, file fuzzy finder for ultra-fast text search. Integrated with vim
+# Project homepage: https://github.com/Magnushhoie/fuz
 
 # 1. section: global constants
 # set -o errexit
 set -o nounset
 set -o pipefail
+# debug mode, run TRACE=1 ./fuz.sh
 if [[ "${TRACE-0}" == "1" ]]; then
-    # debug mode, run TRACE=1 ./fuz.sh
     set -o xtrace
 fi
 
@@ -27,6 +28,7 @@ Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
       [filename]
 
 Inteactively search filenames and contents, open with vim/less
+Project homepage: https://github.com/Magnushhoie/fuz
 
 Available options:
 -h, --help      Print this help and exit
@@ -44,7 +46,7 @@ Examples:
 - Search filenames (-n) from current directory, edit (-e) with vim:
     fuz -n -e
 
-- Find file bash from path (-p) notes/
+- Search file bash from path (-p) notes/
     fuz -p notes/ bash
 
 EOF
@@ -65,7 +67,7 @@ function msg() {
   echo >&2 -e "${1-}"
 }
 
-die() {
+function die() {
   local msg=$1
   local code=${2-1} # default exit status 1
   msg "$msg"
@@ -81,17 +83,47 @@ die() {
 # Arguments:
 #   None
 #######################################
-function open_filematch() {
+function _open_filematch() {
   # First check if valid file
   if [[ -f "$file" ]]; then
     msg "$file"
     if [[ $edit == 1 ]]; then
-      vim +":silent! normal g;" +":set nonu" +":set nohlsearch" +"${linematch:-0}" "$file"
+      vim +":set mouse=a" +":silent! normal g;" \
+          +":set nonu" +":set nohlsearch" \
+          +"${linematch:-0}" "$file"
     else
-      less --RAW-CONTROL-CHARS --hilite-unread --ignore-case  --incsearch \
-      --quit-on-intr --QUIET \
-      +"${linematch:-0}" "$file"
+      less --RAW-CONTROL-CHARS --hilite-unread \
+          --ignore-case  --incsearch \
+          --quit-on-intr \
+          +"${linematch:-0}" "$file"
     fi 
+  fi
+  exit 0
+}
+
+#######################################
+# Searches specific file, select linematch, open with _open_filematch
+# Globals:
+#   file: File to open, fullpath
+#   dir: Search directory
+#   STRING2ARG_FILE: Functions for for FZF preview
+# Arguments:
+#   None
+#######################################
+function _search_file() {
+  if [[ -f "$file" ]]; then
+    filematch=$(rg "^\S" "$file" --color=always --no-heading --with-filename --line-number  \
+        | sed "s;$dir/;;" 2>/dev/null \
+        | fzf -e --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        ) || die "Interrupted"
+
+    # Extract filename and linenumber from match
+    file=$(cut -d":" -f1 <<< "$filematch")
+    file="$dir/$file"
+    linematch=$(cut -d":" -f2 <<< "$filematch")
+
+    # Open with vim or less
+    _open_filematch
   fi
   exit 0
 }
@@ -100,7 +132,6 @@ function main() {
 
   # Check requirements, ripgrep, fzf and bat
   _check_required_programs fzf rg bat
-
 
   # Parse params
   edit='0' # e
@@ -126,24 +157,31 @@ function main() {
   cd "$dir" || die "Error cd dir"
 
 
-  # Open matching file if search query contains single matching filename
+  # fuz [filename]: If only 1 file is found (n=2 levels down), open with vim (edit=1) or search it (edit=0)
   # Null terminator required for files with whitespaces, stop after 2nd match
   # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
   files=()
   while read -r -d $'\0'; do
       files+=("$REPLY")
   done < <(
-    find . -name "*$query*" -maxdepth 1 -print0 \
+    find . -iname "*$query*" -maxdepth 2 -print0 \
       | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
     )
 
+  # 
   if [[ "${#files[@]}" -eq 1 ]]; then
     file=$(realpath "${files[0]}")
-    open_filematch
+
+    if [[ "$edit" -eq 1 ]]; then
+      _open_filematch
+    else
+      _search_file
+    fi
+    
   fi
 
 
-  # fuz -e: Fuzzy search filenames, open in vim
+  # fuz -e: Search filenames, open with vim
   # Ripgrep for filenames
   # Select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
@@ -151,10 +189,10 @@ function main() {
       rg "" --files-with-matches --max-depth $depth 2>/dev/null \
         | fzf -e --select-1 --query "${query: }" --preview="bat --color=always {}"
       )
-    open_filematch
+    _open_filematch
 
 
-  # fuz: # Fuzzy search file-contents, open with less
+  # fuz: Search file-contents, open with less
   # Ripgrep w/ line no. and names, ignoring binary files and .git
   # Select with fzf exact search, select if 1 match
   else
@@ -170,7 +208,7 @@ function main() {
     linematch=$(cut -d":" -f2 <<< "$filematch")
 
     # Open with vim or less
-    open_filematch
+    _open_filematch
   fi 
 
   exit 0

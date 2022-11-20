@@ -14,7 +14,7 @@
   <h1 align="center">fuz</h3>
 
   <p align="center">
-    Terminal-based, file fuzzy finder for ultra-fast text editing
+    Terminal-based, file fuzzy finder for ultra-fast text search
   </p>
 </p>
 

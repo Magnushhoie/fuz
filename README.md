@@ -18,6 +18,12 @@
   </p>
 </p>
 
+</p>
+<p align="center">
+<img src="img/image.jpg" alt="Logo" width="700">
+</p>
+
+
 
 ## Installation
 

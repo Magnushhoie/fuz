@@ -35,10 +35,11 @@ Features:
 
 ```
 Usage: fuz [-h] [-e] [-n] [-v]
-      -d DEPTH -p PATH
+      -d DEPTH -m MAXLINES -p PATH
       [filename]
 
-Interactively search filenames and contents, open with vim/less
+Interactively search files, open with vim/less
+Project homepage: https://github.com/Magnushhoie/fuz
 
 
 Examples:
@@ -53,13 +54,12 @@ Examples:
 
 
 Available options:
--h, --help      Print this help and exit
--d, --depth     Max search depth
--e, --edit      Open with editor (vim) instead of less
--n, --names     Search for filenames
--p, --path      Search path
--s, --setup     Setup search aliases for specific directory # TODO
--v, --verbose   Verbose printing # TODO
+  -h, --help      Print this help and exit
+  -d, --depth     Max search depth
+  -e, --edit      Open with editor (vim) instead of less
+  -n, --names     Search for filenames
+  -m, --maxlines  Maximum linematches read per file
+  -p, --path      Search path
 ```
 
 ## Installation

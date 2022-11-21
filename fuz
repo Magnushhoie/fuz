@@ -149,7 +149,7 @@ function main() {
   edit='0' # e
   open_system='0' # o
   create_file='0' # c
-  depth='2' # d
+  depth='3' # d
   maxlines='1000' # m
   names='0' # n
   dir=$(realpath .) # p 

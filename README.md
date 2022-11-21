@@ -31,6 +31,39 @@ Features:
 - Sane defaults, skip very large files/lines, search max depth
 - Memory mapping with ripgrep
 
+## Installation
+
+```bash
+git clone https://github.com/Magnushhoie/fuz/
+cd fuz
+chmod +x fuz
+
+# Add to .bashrc / .zshrc
+NOTESDIR=$(realpath notes/)
+echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
+echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes/ directory
+echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes/ open in vim
+```
+
+```bash
+# Requirements
+
+# MacOS
+brew install fzf
+brew install rg
+brew install bat
+
+# Ubuntu
+sudo apt-get install fzf
+sudo apt-get install ripgrep
+sudo apt install bat
+
+# Conda
+conda install -c conda-forge fzf
+conda install -c conda-forge ripgrep
+conda install -c conda-forge bat
+```
+
 ## Usage
 
 ```
@@ -62,38 +95,7 @@ Available options:
   -p, --path      Search path
 ```
 
-## Installation
-
-```bash
-git clone https://github.com/Magnushhoie/fuz/
-cd fuz
-chmod +x fuz
-
-# Add to .bashrc / .zshrc
-NOTESDIR=$(realpath notes/)
-echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
-echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes/ directory
-echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes/ open in vim
-```
-
-## Requirements
-```bash
-# MacOS
-brew install fzf
-brew install rg
-brew install bat
-
-# Ubuntu
-sudo apt-get install fzf
-sudo apt-get install ripgrep
-sudo apt install bat
-
-# Conda
-conda install -c conda-forge fzf
-conda install -c conda-forge ripgrep
-conda install -c conda-forge bat
-```
-
+## Read more
 - [fzf](https://github.com/junegunn/fzf)
 - [ripgrep](https://github.com/BurntSushi/ripgrep)
 - [bat](https://github.com/sharkdp/bat)

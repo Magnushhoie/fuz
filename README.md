@@ -24,12 +24,12 @@
 </p>
 
 Features:
-- Search filenames with -n flag, otherwise file-contents
-- Opens files at selected line with less or vim (with -e flag)
-- If a single match is found, open/search that file
-- Ignores hidden directories, .gitignore, binary files and files >2M
-- File preview, syntax highlighting
-- Faster file search with ripgrep
+- Interactively find files by name or content
+- Opens at selected file/line with less or vim
+- Ignores hidden directories, .gitignore, non-text and large files
+- Sane defaults, truncates long files/lines, search max depth
+- File preview at line-match, syntax highlighting w/ bat
+- Memory mapping with ripgrep
 
 ## Usage
 

@@ -39,11 +39,15 @@ git clone https://github.com/Magnushhoie/fuz/
 cd fuz
 chmod +x fuz
 
-# Add to .bashrc / .zshrc
-NOTESDIR=$(realpath notes/)
-echo "alias fuz=\"$(realpath fuz)\"" >> ~/.zshrc # Fuzzy search
-echo "alias fz=\"fuz -p $NOTESDIR\"" >> ~/.zshrc # Search notes/ directory
-echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in notes/ open in vim
+# Add to .zshrc or .bashrc
+FUZ_PATH="$(realpath fuz)"
+echo alias fuz="$FUZ_PATH" >> ~/.zshrc # Search filecontents, open with less
+echo alias fuze=\"fuz -n -e\" >> ~/.zshrc # Search filenames, open with vim
+
+# Point to specific directory (e.g. notes)
+FUZ_DIR=$(realpath notes/) # Search directory
+echo alias fz=\"fuz -p $FUZ_DIR\" >> ~/.zshrc
+echo alias fze=\"fuz -n -e -p $FUZ_DIR\" >> ~/.zshrc
 ```
 
 ```bash

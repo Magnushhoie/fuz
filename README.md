@@ -25,10 +25,10 @@
 
 Features:
 - Interactively find files by name or content
-- Opens at selected file/line with less or vim
+- Opens at selected file/line with less, vim or system default application
 - Ignores hidden directories, .gitignore, non-text and large files
-- Sane defaults, truncates long files/lines, search max depth
 - File preview at line-match, syntax highlighting w/ bat
+- Sane defaults, skip very large files/lines, search max depth
 - Memory mapping with ripgrep
 
 ## Usage

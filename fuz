@@ -31,6 +31,8 @@ Available options:
   -p, --path      Search path (default current)
   -n, --names     Search for filenames
   -e, --edit      Open with editor (vim) instead of less
+  -o, --open      Open with system editor
+  -c, --create    Create new file with vim
   -d, --depth     Max search depth (2)
   -m, --maxlines  Maximum linematches read per file (1000)
   -h, --help      Print this help and exit
@@ -65,18 +67,37 @@ function _check_required_programs() {
 #   file: File fullpath
 #   linematch: Line number
 #   edit: Flag for less (0) or vim (1)
+#   open_system: Flag (-o) for opening with system default program
 # Arguments:
 #   None
 #######################################
 function _open_filematch() {
-  # First check if valid file
+
+  # If open system editor (-o) flag, use open (also valid for directories)
+  if [[ $open_system -eq 1 ]]; then
+    echo >&2 -e "$file"
+
+    # Use open (MacOS) if present, else xdg-open (Linux)
+    if [[ ! -z $(command -v xdg-open) ]]; then
+      open "$file"
+
+    else
+      xdg-open "$file"
+    fi
+
+    exit 0
+  fi
+
+  # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f "$file" ]]; then
     echo >&2 -e "$file"
+
     if [[ $edit == 1 ]]; then
     # Vim mouse-mode, start at top, no line numbering or highlighting
       vim +":set mouse=a" +":silent! normal g;" \
           +":set nonu" +":set nohlsearch" \
           +"${linematch:-0}" "$file"
+
     else
     # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
       less --RAW-CONTROL-CHARS --hilite-unread \
@@ -103,7 +124,7 @@ function _search_file() {
     # sed interpret byte-sequence as 7-bit ASCII / POSIX:
     # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
     # FZF with preview, auto-select if single match
-    filematch=$(rg "^\S" "$file" --color=always --no-heading --with-filename --line-number \
+    filematch=$(rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
         | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
         | fzf -e --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
         ) || exit 1
@@ -126,14 +147,18 @@ function main() {
 
   # Parse parameters
   edit='0' # e
+  open_system='0' # o
+  create_file='0' # c
   depth='2' # d
   maxlines='1000' # m
   names='0' # n
   dir=$(realpath .) # p 
-  while getopts 'hed:m:np:' flag; do
+  while getopts 'heocd:m:np:' flag; do
     case "${flag}" in
       h) usage ;;
       e) edit='1' ;;
+      o) open_system='1' ;;
+      c) create_file='1' ;;
       d) depth="${OPTARG-}"  ;;
       m) maxlines="${OPTARG-}" ;;
       n) names='1' ;;
@@ -146,6 +171,19 @@ function main() {
   
   # Main program
   cd "$dir" || exit 1
+
+  # fuz -c [filename]: Create new file at $dir
+  # Open with Atom if -o flag set, else vim
+  if [[ "$create_file" -eq 1  ]]; then
+    file="$dir/$query"
+    echo >&2 -e "$file"
+    if [[ "$open_system" -eq 1 ]]; then
+      atom "$file"
+    else
+      vim "$file"
+    fi
+    exit 0
+  fi
 
   # fuz [filename]: If only 1 file is found (n=2 levels down), open with vim (edit=1) or search it (edit=0)
   # Find files matching [filename], 2 levels deep, stop after 2nd match
@@ -177,9 +215,9 @@ function main() {
   # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "" --files-with-matches --max-depth "$depth"  --max-columns 1 --max-filesize 1M 2>/dev/null \
+      rg "^" --files-with-matches --max-depth "$depth"  --max-columns 1 --max-filesize 100K 2>/dev/null \
         | fzf -e --select-1 --query "${query: }" --preview="bat --color=always {}"
-      )
+      ) || if [[ "$?" -eq 130  ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Open with vim or less
     _open_filematch
@@ -189,11 +227,11 @@ function main() {
   # FZF with preview, auto-select if single match
   else
     filematch=$(
-      rg "^\S" --color=always --no-heading --with-filename --line-number --max-depth "$depth" \
-      --max-columns 100 --max-filesize 1M --max-count "$maxlines" 2>/dev/null \
+      rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-depth "$depth" \
+      --max-columns 100 --max-filesize 100K --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
-      )
+      ) || if [[ "$?" -eq 130  ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match
     file=$(cut -d":" -f1 <<< "$filematch")

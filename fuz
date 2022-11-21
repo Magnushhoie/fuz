@@ -21,19 +21,19 @@ export FZF_DEFAULT_OPTS="--reverse --inline-info --ansi"
 function usage() {
 cat << EOF #
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
-      -d DEPTH -p PATH
+      -d DEPTH -m MAXLINES -p PATH
       [filename]
 
 Interactively search files, open with vim/less
 Project homepage: https://github.com/Magnushhoie/fuz
 
 Available options:
--h, --help      Print this help and exit
--d, --depth     Max search depth
--e, --edit      Open with editor (vim) instead of less
--n, --names     Search for filenames
--m, --maxlines  Maximum linematches read per file
--p, --path      Search path
+  -p, --path      Search path (default current)
+  -n, --names     Search for filenames
+  -e, --edit      Open with editor (vim) instead of less
+  -d, --depth     Max search depth (2)
+  -m, --maxlines  Maximum linematches read per file (1000)
+  -h, --help      Print this help and exit
 
 Examples:
 - Search file-contents from current directory, open with less:
@@ -121,10 +121,10 @@ function _search_file() {
 
 function main() {
 
-  # Check requirements, ripgrep, fzf and bat
+  # Check in path: fzf, ripgrep and bat
   _check_required_programs fzf rg bat
 
-  # Parse params
+  # Parse parameters
   edit='0' # e
   depth='2' # d
   maxlines='1000' # m

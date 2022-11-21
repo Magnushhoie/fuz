@@ -34,6 +34,7 @@ Features:
 ## Installation
 
 ```bash
+# Download
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz
 chmod +x fuz
@@ -49,19 +50,13 @@ echo "alias fze=\"fuz -n -e -p $NOTESDIR\"" >> ~/.zshrc # Search filenames in no
 # Requirements
 
 # MacOS
-brew install fzf
-brew install rg
-brew install bat
+brew install fzf rg bat
 
 # Ubuntu
-sudo apt-get install fzf
-sudo apt-get install ripgrep
-sudo apt install bat
+sudo apt-get install fzf ripgrep bat
 
 # Conda
-conda install -c conda-forge fzf
-conda install -c conda-forge ripgrep
-conda install -c conda-forge bat
+conda install -c conda-forge fzf ripgrep bat
 ```
 
 ## Usage

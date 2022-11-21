@@ -101,7 +101,7 @@ function _open_filematch() {
     else
     # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
       less --RAW-CONTROL-CHARS --hilite-unread \
-          --ignore-case  --incsearch \
+          --ignore-case \
           --quit-on-intr \
           +"${linematch:-0}" "$file"
     fi 

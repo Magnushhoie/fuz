@@ -6,21 +6,28 @@
 # 1. section: global constants
 set -o nounset
 set -o pipefail
-# debug mode, run TRACE=1 ./fuz.sh
-if [[ "${TRACE-0}" == "1" ]]; then
-    set -o xtrace
+if [[ ${TRACE-0} == "1" ]]; then
+  set -o xtrace
 fi
+
 # Script parameters
-export SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 > /dev/null; pwd -P )"
-export STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
+SCRIPTPATH="$(
+  cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 >/dev/null
+  pwd -P
+)"
+declare -r SCRIPTPATH
+declare -r STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
+
 # FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
 export FZF_DEFAULT_OPTS="--reverse --inline-info --ansi"
 
 # 2. section: functions
 function usage() {
-cat << EOF #
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
+  cat <<EOF #
+Usage: $(
+    basename "${BASH_SOURCE[0]}"
+  ) [-h] [-e] [-n] [-v]
       -d DEPTH -m MAXLINES -p PATH
       [filename]
 
@@ -54,11 +61,12 @@ EOF
 # all progs need to be given as parameters
 function _check_required_programs() {
   for p in "${@}"; do
-    hash "${p}" 2>&- || \
-        { echo >&2 -e " Required program \"${p}\" not installed or in search PATH.";
-                exit 1;
-              }
-    done
+    hash "${p}" 2>&- \
+      || {
+        echo >&2 -e " Required program \"${p}\" not installed or in search PATH."
+        exit 1
+      }
+  done
 }
 
 #######################################
@@ -78,7 +86,7 @@ function _open_filematch() {
     echo >&2 -e "$file"
 
     # Use open (MacOS) if present, else xdg-open (Linux)
-    if [[ ! -z $(command -v xdg-open) ]]; then
+    if [[ -n $(command -v xdg-open) ]]; then
       open "$file"
 
     else
@@ -89,22 +97,22 @@ function _open_filematch() {
   fi
 
   # If valid file, open with vim if edit (-e) flag, else less
-  if [[ -f "$file" ]]; then
+  if [[ -f $file ]]; then
     echo >&2 -e "$file"
 
     if [[ $edit == 1 ]]; then
-    # Vim mouse-mode, start at top, no line numbering or highlighting
+      # Vim mouse-mode, start at top, no line numbering or highlighting
       vim +":set mouse=a" +":silent! normal g;" \
-          +":set nonu" +":set nohlsearch" \
-          +"${linematch:-0}" "$file"
+        +":set nonu" +":set nohlsearch" \
+        +"${linematch:-0}" "$file"
 
     else
-    # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
+      # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
       less --RAW-CONTROL-CHARS --hilite-unread \
-          --ignore-case \
-          --quit-on-intr \
-          +"${linematch:-0}" "$file"
-    fi 
+        --ignore-case \
+        --quit-on-intr \
+        +"${linematch:-0}" "$file"
+    fi
   fi
   exit 0
 }
@@ -119,20 +127,21 @@ function _open_filematch() {
 #   None
 #######################################
 function _search_file() {
-  if [[ -f "$file" ]]; then
+  if [[ -f $file ]]; then
     # Ripgrep file for lines with starting characters
     # sed interpret byte-sequence as 7-bit ASCII / POSIX:
     # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
     # FZF with preview, auto-select if single match
-    filematch=$(rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
+    filematch=$(
+      rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
         | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
         | fzf -e --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
-        ) || exit 1
+    ) || exit 1
 
     # Extract filename and linenumber from match
-    file=$(cut -d":" -f1 <<< "$filematch")
+    file=$(cut -d":" -f1 <<<"$filematch")
     file="$dir/$file"
-    linematch=$(cut -d":" -f2 <<< "$filematch")
+    linematch=$(cut -d":" -f2 <<<"$filematch")
 
     # Open with vim or less
     _open_filematch
@@ -146,38 +155,38 @@ function main() {
   _check_required_programs fzf rg bat
 
   # Parse parameters
-  edit='0' # e
-  open_system='0' # o
-  create_file='0' # c
-  depth='3' # d
-  maxlines='1000' # m
-  names='0' # n
-  dir=$(realpath .) # p 
+  edit='0'          # e
+  open_system='0'   # o
+  create_file='0'   # c
+  depth='3'         # d
+  maxlines='1000'   # m
+  names='0'         # n
+  dir=$(realpath .) # p
   while getopts 'heocd:m:np:' flag; do
     case "${flag}" in
       h) usage ;;
       e) edit='1' ;;
       o) open_system='1' ;;
       c) create_file='1' ;;
-      d) depth="${OPTARG-}"  ;;
+      d) depth="${OPTARG-}" ;;
       m) maxlines="${OPTARG-}" ;;
       n) names='1' ;;
       p) dir=$(realpath "${OPTARG-}") ;;
-      *) echo "Unexpected option ${flag-}" ;;
+      *) echo "Unexpected option ${flag-}" && exit 1 ;;
     esac
-  done 
-  shift $((OPTIND-1))
+  done
+  shift $((OPTIND - 1))
   query="${*-}"
-  
+
   # Main program
   cd "$dir" || exit 1
 
   # fuz -c [filename]: Create new file at $dir
   # Open with Atom if -o flag set, else vim
-  if [[ "$create_file" -eq 1  ]]; then
+  if [[ $create_file -eq 1 ]]; then
     file="$dir/$query"
     echo >&2 -e "$file"
-    if [[ "$open_system" -eq 1 ]]; then
+    if [[ $open_system -eq 1 ]]; then
       atom "$file"
     else
       vim "$file"
@@ -191,17 +200,17 @@ function main() {
   # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
   files=()
   while read -r -d $'\0'; do
-      files+=("$REPLY")
+    files+=("$REPLY")
   done < <(
     find . -iname "*$query*" -maxdepth "$depth" -print0 2>/dev/null \
       | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
-    ) || exit 1
+  ) || exit 1
 
   # If found single match, open or search
-  if [[ "${#files[@]}" -eq 1 ]]; then
+  if [[ ${#files[@]} -eq 1 ]]; then
     file=$(realpath "${files[0]}")
 
-    if [[ "$edit" -eq 1 ]]; then
+    if [[ $edit -eq 1 ]]; then
       # Open file with vim or less
       _open_filematch
     else
@@ -215,9 +224,9 @@ function main() {
   # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "^" --files-with-matches --max-depth "$depth"  --max-columns 1 --max-filesize 100K 2>/dev/null \
-        | fzf -e --select-1 --query "${query: }" --preview="bat --color=always {}"
-      ) || if [[ "$?" -eq 130  ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
+      rg "^" --files-with-matches --max-depth "$depth" --max-columns 1 --max-filesize 100K 2>/dev/null \
+        | fzf -e --select-1 --query "${query-}" --preview="bat --color=always {}"
+    ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Open with vim or less
     _open_filematch
@@ -228,19 +237,19 @@ function main() {
   else
     filematch=$(
       rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-depth "$depth" \
-      --max-columns 100 --max-filesize 100K --max-count "$maxlines" 2>/dev/null \
+        --max-columns 100 --max-filesize 100K --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
-      ) || if [[ "$?" -eq 130  ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
+    ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match
-    file=$(cut -d":" -f1 <<< "$filematch")
+    file=$(cut -d":" -f1 <<<"$filematch")
     file="$dir/$file"
-    linematch=$(cut -d":" -f2 <<< "$filematch")
+    linematch=$(cut -d":" -f2 <<<"$filematch")
 
     # Open with vim or less
     _open_filematch
-  fi 
+  fi
 
   exit 0
 }

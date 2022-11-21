@@ -4,19 +4,16 @@
 # Project homepage: https://github.com/Magnushhoie/fuz
 
 # 1. section: global constants
-# set -o errexit
 set -o nounset
 set -o pipefail
 # debug mode, run TRACE=1 ./fuz.sh
 if [[ "${TRACE-0}" == "1" ]]; then
     set -o xtrace
 fi
-
-declare -r SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" || die "Error SCRIPTPATH" > /dev/null; pwd -P )"
-declare -r STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
-declare -r IFS=""
-
-# FZF defaults
+# Script parameters
+export SCRIPTPATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 > /dev/null; pwd -P )"
+export STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
+# FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
 export FZF_DEFAULT_OPTS="--reverse --inline-info --ansi"
 
@@ -27,7 +24,7 @@ Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-e] [-n] [-v]
       -d DEPTH -p PATH
       [filename]
 
-Inteactively search filenames and contents, open with vim/less
+Interactively search files, open with vim/less
 Project homepage: https://github.com/Magnushhoie/fuz
 
 Available options:
@@ -35,9 +32,8 @@ Available options:
 -d, --depth     Max search depth
 -e, --edit      Open with editor (vim) instead of less
 -n, --names     Search for filenames
+-m, --maxlines  Maximum linematches read per file
 -p, --path      Search path
--s, --setup     Setup search aliases for specific directory # TODO
--v, --verbose   Verbose printing # TODO
 
 Examples:
 - Search file-contents from current directory, open with less:
@@ -57,41 +53,32 @@ EOF
 function _check_required_programs() {
   for p in "${@}"; do
     hash "${p}" 2>&- || \
-        { msg " Required program \"${p}\" not installed or in search PATH.";
+        { echo >&2 -e " Required program \"${p}\" not installed or in search PATH.";
                 exit 1;
               }
     done
 }
 
-function msg() {
-  echo >&2 -e "${1-}"
-}
-
-function die() {
-  local msg=$1
-  local code=${2-1} # default exit status 1
-  msg "$msg"
-  exit "$code"
-}
-
 #######################################
-# Open file with vim or less at linenumber
+# Open file with less or vim (-e) at selected linenumber
 # Globals:
-#   file: File to open, fullpath
-#   linematch: Line number to open at
-#   edit: 1 for vim, 0 for less
+#   file: File fullpath
+#   linematch: Line number
+#   edit: Flag for less (0) or vim (1)
 # Arguments:
 #   None
 #######################################
 function _open_filematch() {
   # First check if valid file
   if [[ -f "$file" ]]; then
-    msg "$file"
+    echo >&2 -e "$file"
     if [[ $edit == 1 ]]; then
+    # Vim mouse-mode, start at top, no line numbering or highlighting
       vim +":set mouse=a" +":silent! normal g;" \
           +":set nonu" +":set nohlsearch" \
           +"${linematch:-0}" "$file"
     else
+    # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
       less --RAW-CONTROL-CHARS --hilite-unread \
           --ignore-case  --incsearch \
           --quit-on-intr \
@@ -112,10 +99,14 @@ function _open_filematch() {
 #######################################
 function _search_file() {
   if [[ -f "$file" ]]; then
-    filematch=$(rg "^\S" "$file" --color=always --no-heading --with-filename --line-number  \
-        | sed "s;$dir/;;" 2>/dev/null \
+    # Ripgrep file for lines with starting characters
+    # sed interpret byte-sequence as 7-bit ASCII / POSIX:
+    # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
+    # FZF with preview, auto-select if single match
+    filematch=$(rg "^\S" "$file" --color=always --no-heading --with-filename --line-number \
+        | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
         | fzf -e --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
-        ) || die "Interrupted"
+        ) || exit 1
 
     # Extract filename and linenumber from match
     file=$(cut -d":" -f1 <<< "$filematch")
@@ -135,71 +126,72 @@ function main() {
 
   # Parse params
   edit='0' # e
-  depth='3' # d
+  depth='2' # d
+  maxlines='1000' # m
   names='0' # n
   dir=$(realpath .) # p 
-  verbose='0' # v
-  while getopts 'hednp:v' flag; do
+  while getopts 'hed:m:np:' flag; do
     case "${flag}" in
       h) usage ;;
       e) edit='1' ;;
-      d) depth="${OPTARG}" shift ;;
+      d) depth="${OPTARG-}"  ;;
+      m) maxlines="${OPTARG-}" ;;
       n) names='1' ;;
-      p) dir=$(realpath "${OPTARG}") ;;
-      v) verbose='1' ;;
-      *) echo "Unexpected option ${flag}" ;;
+      p) dir=$(realpath "${OPTARG-}") ;;
+      *) echo "Unexpected option ${flag-}" ;;
     esac
   done 
   shift $((OPTIND-1))
   query="${*-}"
   
   # Main program
-  cd "$dir" || die "Error cd dir"
-
+  cd "$dir" || exit 1
 
   # fuz [filename]: If only 1 file is found (n=2 levels down), open with vim (edit=1) or search it (edit=0)
-  # Find files (2) levels deep, stop after 2nd file
-  # Null terminator trick for files with whitespaces
+  # Find files matching [filename], 2 levels deep, stop after 2nd match
+  # Null terminator trick for handling filepaths with whitespaces
   # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
   files=()
   while read -r -d $'\0'; do
       files+=("$REPLY")
   done < <(
-    find . -iname "*$query*" -maxdepth 2 -print0 2>/dev/null \
+    find . -iname "*$query*" -maxdepth "$depth" -print0 2>/dev/null \
       | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
-    )
+    ) || exit 1
 
-  # 
+  # If found single match, open or search
   if [[ "${#files[@]}" -eq 1 ]]; then
     file=$(realpath "${files[0]}")
 
     if [[ "$edit" -eq 1 ]]; then
+      # Open file with vim or less
       _open_filematch
     else
+      # Search single file contents
       _search_file
     fi
-    
   fi
 
-
   # fuz -e: Search filenames, open with vim
-  # Ripgrep for filenames
-  # Select with fzf exact search, select if 1 match
+  # Ripgrep for filenames only
+  # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "" --files-with-matches --max-depth $depth 2>/dev/null \
+      rg "" --files-with-matches --max-depth "$depth"  --max-columns 1 --max-filesize 1M 2>/dev/null \
         | fzf -e --select-1 --query "${query: }" --preview="bat --color=always {}"
       )
-    _open_filematch
 
+    # Open with vim or less
+    _open_filematch
 
   # fuz: Search file-contents, open with less
   # Ripgrep w/ line no. and names, ignoring binary files and .git
-  # Select with fzf exact search, select if 1 match
+  # FZF with preview, auto-select if single match
   else
     filematch=$(
-      rg "^\S" --color=always --no-heading --with-filename --line-number --max-depth $depth --max-columns 100 --max-filesize 2M 2>/dev/null \
-        | sed "s;$dir/;;" 2>/dev/null \
+      rg "^\S" --color=always --no-heading --with-filename --line-number --max-depth "$depth" \
+      --max-columns 100 --max-filesize 1M --max-count "$maxlines" 2>/dev/null \
+        | LC_ALL=C sed "s;$dir/;;" \
         | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
       )
 
@@ -215,5 +207,5 @@ function main() {
   exit 0
 }
 
-# this is the main executable function at end of script
+# Run program
 main "$@"

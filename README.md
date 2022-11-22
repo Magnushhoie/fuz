@@ -34,33 +34,25 @@ Features:
 ## Installation
 
 ```bash
+# Requirements (Pick one)
+brew install fzf rg bat # MacOS
+sudo apt-get install fzf ripgrep bat # Ubuntu
+conda install -c conda-forge fzf ripgrep bat # Conda
+
 # Download
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz
 chmod +x fuz
 
-# Add to .zshrc or .bashrc
+# Add to your .zshrc or .bashrc
 FUZ_PATH="$(realpath fuz)"
 echo alias fuz="$FUZ_PATH" >> ~/.zshrc # Search filecontents, open with less
 echo alias fuze=\"fuz -n -e\" >> ~/.zshrc # Search filenames, open with vim
 
-# Point to specific directory (e.g. notes)
-FUZ_DIR=$(realpath notes/) # Search directory
+# Suggested: Point to specific directory (e.g. notes)
+FUZ_DIR=$(realpath notes/) # Favorite directory
 echo alias fz=\"fuz -p $FUZ_DIR\" >> ~/.zshrc
 echo alias fze=\"fuz -n -e -p $FUZ_DIR\" >> ~/.zshrc
-```
-
-```bash
-# Requirements
-
-# MacOS
-brew install fzf rg bat
-
-# Ubuntu
-sudo apt-get install fzf ripgrep bat
-
-# Conda
-conda install -c conda-forge fzf ripgrep bat
 ```
 
 ## Usage

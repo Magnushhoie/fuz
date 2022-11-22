@@ -35,14 +35,15 @@ Interactively search files, open with vim/less
 Project homepage: https://github.com/Magnushhoie/fuz
 
 Available options:
-  -p, --path      Search path (default current)
-  -n, --names     Search for filenames
-  -e, --edit      Open with editor (vim) instead of less
-  -o, --open      Open with system editor
-  -c, --create    Create new file with vim
-  -d, --depth     Max search depth (2)
-  -m, --maxlines  Maximum linematches read per file (1000)
-  -h, --help      Print this help and exit
+  -p, --path       Search path (default current)
+  -n, --names      Search for filenames
+  -e, --edit       Open with editor (vim) instead of less
+  -o, --open       Open with system editor
+  -c, --create     Create new file with vim
+  -d, --max-depth  Max search depth (3)
+  -m, --max-lines  Max line-matches per file (1000)
+  -s, --max-size   Max file-size (50K)
+  -h, --help       Print this help and exit
 
 Examples:
 - Search file-contents from current directory, open with less:
@@ -58,12 +59,69 @@ EOF
   exit 1
 }
 
+msg() {
+  echo >&2 -e "${1-}"
+}
+
+die() {
+  local msg=$1
+  local code=${2-1} # default exit status 1
+  msg "$msg"
+  exit "$code"
+}
+
+parse_params() {
+  # default values of variables set from params
+  edit='0'            # e
+  open_system='0'     # o
+  create_file='0'     # c
+  maxdepth='3'        # d
+  maxlines='1000'     # m
+  maxsize='50K'       # m
+  names='0'           # n
+  dir="$(realpath .)" # p
+
+  while :; do
+    case "${1-}" in
+      -h | --help) usage ;;
+      -e | --edit) edit='1' ;;
+      -o | --open) open_system='1' ;;
+      -c | --create) create_file='1' ;;
+      -n | --names) names='1' ;;
+      -d | --max-depth)
+        maxdepth="${2-}"
+        shift
+        ;;
+      -m | --max-lines)
+        maxlines="${2-}"
+        shift
+        ;;
+      -s | --max-size)
+        maxsize="${2-}"
+        shift
+        ;;
+      -p | --path)
+        dir="$(realpath "${2-}")"
+        shift
+        ;;
+      -?*) die "Unknown option: $1" ;;
+      *) break ;;
+    esac
+    shift
+  done
+
+  #query="${*-}"
+  query="${*-}"
+
+  return 0
+}
+
 # all progs need to be given as parameters
 function _check_required_programs() {
   for p in "${@}"; do
     hash "${p}" 2>&- \
       || {
-        echo >&2 -e " Required program \"${p}\" not installed or in search PATH."
+        msg " Required program \"${p}\" not installed or in search PATH."
         exit 1
       }
   done
@@ -83,10 +141,10 @@ function _open_filematch() {
 
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
-    echo >&2 -e "$file"
+    msg "$file"
 
     # Use open (MacOS) if present, else xdg-open (Linux)
-    if [[ -n $(command -v xdg-open) ]]; then
+    if [[ -z $(command -v xdg-open) ]]; then
       open "$file"
 
     else
@@ -98,7 +156,7 @@ function _open_filematch() {
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
-    echo >&2 -e "$file"
+    msg "$file"
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, no line numbering or highlighting
@@ -128,6 +186,7 @@ function _open_filematch() {
 #######################################
 function _search_file() {
   if [[ -f $file ]]; then
+
     # Ripgrep file for lines with starting characters
     # sed interpret byte-sequence as 7-bit ASCII / POSIX:
     # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
@@ -155,28 +214,8 @@ function main() {
   _check_required_programs fzf rg bat
 
   # Parse parameters
-  edit='0'          # e
-  open_system='0'   # o
-  create_file='0'   # c
-  depth='3'         # d
-  maxlines='1000'   # m
-  names='0'         # n
-  dir=$(realpath .) # p
-  while getopts 'heocd:m:np:' flag; do
-    case "${flag}" in
-      h) usage ;;
-      e) edit='1' ;;
-      o) open_system='1' ;;
-      c) create_file='1' ;;
-      d) depth="${OPTARG-}" ;;
-      m) maxlines="${OPTARG-}" ;;
-      n) names='1' ;;
-      p) dir=$(realpath "${OPTARG-}") ;;
-      *) echo "Unexpected option ${flag-}" && exit 1 ;;
-    esac
-  done
-  shift $((OPTIND - 1))
-  query="${*-}"
+  parse_params "$@"
+  # query="${args[*]-}"
 
   # Main program
   cd "$dir" || exit 1
@@ -185,7 +224,7 @@ function main() {
   # Open with Atom if -o flag set, else vim
   if [[ $create_file -eq 1 ]]; then
     file="$dir/$query"
-    echo >&2 -e "$file"
+    msg "$file"
     if [[ $open_system -eq 1 ]]; then
       atom "$file"
     else
@@ -202,7 +241,7 @@ function main() {
   while read -r -d $'\0'; do
     files+=("$REPLY")
   done < <(
-    find . -iname "*$query*" -maxdepth "$depth" -print0 2>/dev/null \
+    find . -iname "*$query*" -maxdepth "$maxdepth" -print0 2>/dev/null \
       | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
   ) || exit 1
 
@@ -224,7 +263,8 @@ function main() {
   # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "^" --files-with-matches --max-depth "$depth" --max-columns 1 --max-filesize 100K 2>/dev/null \
+      rg "^" --files-with-matches --max-columns 1 \
+        --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
         | fzf -e --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
@@ -236,8 +276,8 @@ function main() {
   # FZF with preview, auto-select if single match
   else
     filematch=$(
-      rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-depth "$depth" \
-        --max-columns 100 --max-filesize 100K --max-count "$maxlines" 2>/dev/null \
+      rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-columns 100 \
+        --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)

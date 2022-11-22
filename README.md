@@ -24,11 +24,11 @@
 </p>
 
 Features:
-- Interactively find files by name or content
-- Opens at selected file/line with less, vim or system default application
-- Ignores hidden directories, .gitignore, non-text and large files
+- Interactively searches files and filenames
+- Opens selected file/line at search result with less / vim / system app
+- Ignores hidden directories, .gitignore, binary and large files
 - File preview at line-match, syntax highlighting w/ bat
-- Sane defaults, skip very large files/lines, search max depth
+- Sane defaults, search max depth, caps matches for very large files
 - Memory mapping with ripgrep
 
 ## Installation

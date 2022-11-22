@@ -83,12 +83,15 @@ Examples:
 
 
 Available options:
-  -h, --help      Print this help and exit
-  -d, --depth     Max search depth
-  -e, --edit      Open with editor (vim) instead of less
-  -n, --names     Search for filenames
-  -m, --maxlines  Maximum linematches read per file
-  -p, --path      Search path
+  -p, --path       Search path (default current)
+  -n, --names      Search for filenames
+  -e, --edit       Open with editor (vim) instead of less
+  -o, --open       Open with system editor
+  -c, --create     Create new file with vim
+  -d, --max-depth  Max search depth (3)
+  -m, --max-lines  Max line-matches per file (1000)
+  -s, --max-size   Max file-size (50K)
+  -h, --help       Print this help and exit
 ```
 
 ## Read more

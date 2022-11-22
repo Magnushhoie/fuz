@@ -69,7 +69,7 @@ Usage: fuz [-cdehmnos]
       [filename or pattern]
 
 Fuz interactively searches the current directory, and
-opens selected file and line with less / vim / system app.
+opens selected file at search result with less / vim / system app.
 
 Skips .gitignore, hidden, binary and large files.
 

@@ -63,11 +63,16 @@ conda install -c conda-forge fzf ripgrep bat
 ## Usage
 
 ```
-Usage: fuz [-h] [-e] [-n] [-v]
-      -d DEPTH -m MAXLINES -p PATH
-      [filename]
+Usage: fuz [-cdehmnos]
+      -p path -c filename 
+      -d num -m num -s filesize
+      [filename or pattern]
 
-Interactively search files, open with vim/less
+Fuz interactively searches the current directory, and
+opens selected file and line with less / vim / system app.
+
+Skips .gitignore, hidden, binary and large files.
+
 Project homepage: https://github.com/Magnushhoie/fuz
 
 

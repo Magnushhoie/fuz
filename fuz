@@ -53,15 +53,16 @@ ARGS:
   <PATH>      A directory to search from
 
 OPTIONS:
-  -p, --path       Search path (default current)
-  -n, --names      Search for filenames
-  -e, --edit       Open with editor (vim) instead of less
-  -o, --open       Open with system editor
-  -c, --create     Create new file with vim
-  -d, --max-depth  Max search depth (3)
-  -m, --max-lines  Max line-matches per file (1000)
-  -s, --max-size   Max file-size (50K)
-  -h, --help       Print this help and exit
+  -p, --path         Search path (default current)
+  -n, --names        Search for filenames
+  -e, --edit         Open with editor (vim) instead of less
+  -o, --open         Open with system editor
+  -c, --create       Create new file with vim
+  -d, --max-depth    Max search depth (3)
+  -m, --max-lines    Max line-matches per file (1000)
+  -s, --max-size     Max file-size (50K)
+  -f, --fuzzy-search Enable fuzzy instead of exact search
+  -h, --help         Print this help and exit
 
 EXAMPLES:
 - Search file-contents from current directory, open with less:
@@ -97,6 +98,7 @@ parse_params() {
   maxlines='1000'     # m
   maxsize='50K'       # m
   names='0'           # n
+  fuzzysearch='-e'    # f
   dir="$(realpath .)" # p
 
   while :; do
@@ -106,6 +108,7 @@ parse_params() {
       -o | --open) open_system='1' ;;
       -c | --create) create_file='1' ;;
       -n | --names) names='1' ;;
+      -f | --fuzzy-search) fuzzysearch='' ;;
       -d | --max-depth)
         maxdepth="${2-}"
         shift
@@ -177,17 +180,16 @@ function _open_filematch() {
     msg "$file"
 
     if [[ $edit == 1 ]]; then
-      # Vim mouse-mode, start at top, no line numbering or highlighting
+      # Vim mouse-mode, start at top, softwrap, no numbering/highlight
       vim +":set mouse=a" +":silent! normal g;" \
-        +":set nonu" +":set nohlsearch" \
+      +":set wrap linebreak nolist" \
+      +":set nu showbreak= conceallevel=0 colorcolumn=" \
+        +":set nohlsearch" \
         +"${linematch:-0}" "$file"
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      less --RAW-CONTROL-CHARS --hilite-unread \
-        --ignore-case \
-        --quit-on-intr \
-        +"${linematch:-0}" "$file"
+      bat "$file" --pager="less +${linematch:-0}G --ignore-case" --style plain
     fi
   fi
   exit 0
@@ -212,7 +214,7 @@ function _search_file() {
     filematch=$(
       rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
         | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
-        | fzf -e --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf $fuzzysearch --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || exit 1
 
     # Extract filename and linenumber from match
@@ -283,7 +285,7 @@ function main() {
     file=$(
       rg "^" --files-with-matches --max-columns 1 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
-        | fzf -e --select-1 --query "${query-}" --preview="bat --color=always {}"
+        | fzf $fuzzysearch --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Open with vim or less
@@ -297,7 +299,7 @@ function main() {
       rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-columns 100 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
-        | fzf -e --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf $fuzzysearch --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

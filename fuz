@@ -189,7 +189,7 @@ function _open_filematch() {
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      bat "$file" --pager="less +${linematch:-0}G --ignore-case" --style plain
+      bat "$file" --pager="less +${linematch:-0}g --ignore-case" --style plain
     fi
   fi
   exit 0

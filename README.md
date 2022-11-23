@@ -24,10 +24,10 @@
 </p>
 
 Features:
-- Interactively searches files and filenames
+- Interactively searches files and filenames with preview
 - Opens selected file/line at search result with less / vim / system app
+- Markdown / code highlighting with bat
 - Ignores hidden directories, .gitignore, binary and large files
-- File preview at line-match, syntax highlighting w/ bat
 - Sane defaults, search max depth, caps matches for very large files
 - Memory mapping with ripgrep
 

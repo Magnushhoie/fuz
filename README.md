@@ -24,7 +24,7 @@
 </p>
 
 Features:
-- Interactively searches files and filenames with preview
+- Interactively find files files and filenames with preview
 - Opens selected file/line at search result with less / vim / system app
 - Markdown / code highlighting with bat
 - Ignores hidden directories, .gitignore, binary and large files

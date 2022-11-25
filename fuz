@@ -11,12 +11,14 @@ if [[ ${TRACE-0} == "1" ]]; then
 fi
 
 # Script parameters
-SCRIPTPATH="$(
+SCRIPT_DIR="$(
   cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 >/dev/null
   pwd -P
 )"
-declare -r SCRIPTPATH
-declare -r STRING2ARG_FILE="$SCRIPTPATH/string2arg.sh"
+SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
+declare -r SCRIPT_DIR
+declare -r SCRIPT_PATH
+declare -r STRING2ARG_FILE="$SCRIPT_DIR/string2arg.sh"
 
 # FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
@@ -91,14 +93,15 @@ die() {
 
 parse_params() {
   # default values of variables set from params
-  edit='0'            # e
-  open_system='0'     # o
-  create_file='0'     # c
-  maxdepth='3'        # d
-  maxlines='1000'     # m
-  maxsize='50K'       # m
-  names='0'           # n
-  fuzzysearch='-e'    # f
+  edit='0'         # e
+  open_system='0'  # o
+  create_file='0'  # c
+  maxdepth='3'     # d
+  maxlines='1000'  # m
+  maxsize='50K'    # m
+  names='0'        # n
+  fuzzysearch='-e' # f
+  setup="0"        # setup
   dir="$(realpath .)" # p
 
   while :; do
@@ -109,6 +112,7 @@ parse_params() {
       -c | --create) create_file='1' ;;
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
+      --setup) setup='1' ;;
       -d | --max-depth)
         maxdepth="${2-}"
         shift
@@ -149,6 +153,38 @@ function _check_required_programs() {
 }
 
 #######################################
+# Adds aliases fuz, fz fze, fzo to .bashrc/.zshrc
+# with user inputted path, if not present
+# Globals:
+#   file: SCRIPT_PATH
+# Arguments:
+#   None
+#######################################
+function add_aliases_bashrc() {
+  read -rp "Add fuz aliases with path to ~/.bashrc and ~/.zshrc? y/n"$'\n' -n 1 -r
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+    read -rp $'\n'"Please specify search directory (default $SCRIPT_DIR/notes/):"$'\n' filepath
+    FUZ_DIR=$(realpath "${filepath:-"$SCRIPT_DIR"/notes}")
+
+    echo -e "Adding aliases to .bashrc and ~/.zshrc ..."
+    BASHRC=$(echo -e "$HOME"/.bashrc)
+    ZSHRC=$(echo -e "$HOME"/.zshrc)
+    LINE0=$(echo -e alias fuz=\'$SCRIPT_PATH\') && echo "$LINE0"
+    LINE1=$(echo -e alias fz=\'fuz --path \"$FUZ_DIR\"\') && echo "$LINE1"
+    LINE2=$(echo -e alias fze=\'fuz --edit --names --path \"$FUZ_DIR\"\') && echo "$LINE2"
+    LINE3=$(echo -e alias fzo=\'fuz --open --names --path \"$FUZ_DIR\"\') && echo "$LINE3"
+
+    for file in "$BASHRC" "$ZSHRC"; do
+      for line in "$LINE0" "$LINE1" "$LINE2" "$LINE3"; do
+        grep -qF -- "$line" "$file" || echo -e "$line" >>"$file"
+      done
+    done
+    echo -e "Please restart your shell for changes to take effect"
+  fi
+}
+
+#######################################
 # Open file with less or vim (-e) at selected linenumber
 # Globals:
 #   file: File fullpath
@@ -182,9 +218,9 @@ function _open_filematch() {
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight
       vim +":set mouse=a" +":silent! normal g;" \
-      +":set wrap linebreak nolist" \
-      +":set nu showbreak= conceallevel=0 colorcolumn=" \
-        +":set nohlsearch" \
+        +":set number nohlsearch" \
+        +":set wrap linebreak nolist" \
+        +":set textwidth=0 showbreak= colorcolumn= conceallevel=0 " \
         +"${linematch:-0}" "$file"
 
     else
@@ -214,7 +250,7 @@ function _search_file() {
     filematch=$(
       rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
         | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
-        | fzf $fuzzysearch --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf "$fuzzysearch" --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || exit 1
 
     # Extract filename and linenumber from match
@@ -231,11 +267,16 @@ function _search_file() {
 function main() {
 
   # Check in path: fzf, ripgrep and bat
-  _check_required_programs fzf rg bat
+  _check_required_programs fzf rg bat realpath
 
   # Parse parameters
   parse_params "$@"
-  # query="${args[*]-}"
+
+  # If setup flag, add aliases to .bashrc
+  if [[ $setup -eq 1 ]]; then
+    add_aliases_bashrc
+    exit 1
+  fi
 
   # Main program
   cd "$dir" || exit 1
@@ -285,7 +326,7 @@ function main() {
     file=$(
       rg "^" --files-with-matches --max-columns 1 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
-        | fzf $fuzzysearch --select-1 --query "${query-}" --preview="bat --color=always {}"
+        | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Open with vim or less
@@ -299,7 +340,7 @@ function main() {
       rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-columns 100 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
-        | fzf $fuzzysearch --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf "$fuzzysearch" --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

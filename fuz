@@ -272,7 +272,7 @@ function main() {
   # Parse parameters
   parse_params "$@"
 
-  # If setup flag, add aliases to .bashrc
+  # fuz --setup: Add aliases to .zshrc/.bashrc
   if [[ $setup -eq 1 ]]; then
     add_aliases_bashrc
     exit 1
@@ -282,12 +282,14 @@ function main() {
   cd "$dir" || exit 1
 
   # fuz -c [filename]: Create new file at $dir
-  # Open with Atom if -o flag set, else vim
   if [[ $create_file -eq 1 ]]; then
     file="$dir/$query"
     msg "$file"
+
+    # Touch and open with system if --open flag, else use vim
     if [[ $open_system -eq 1 ]]; then
-      atom "$file"
+      touch "$file"
+      open "$file"
     else
       vim "$file"
     fi

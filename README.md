@@ -34,19 +34,11 @@ Features:
 ## Installation
 
 ```bash
-# 1. Download
+# Download and install
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
+./fuz --setup
 
-# 2. Add to your .zshrc or .bashrc
-FUZ_PATH="$(realpath fuz)"
-echo alias fuz="$FUZ_PATH" >> ~/.zshrc # Search filecontents, open with less
-echo alias fuze=\"fuz --names --edit\" >> ~/.zshrc # Search filenames, open with vim
-
-# 3. Optional: Point to specific directory (e.g. notes)
-FUZ_DIR="$(realpath notes/)" # Favorite directory
-echo alias fz=\"fuz --path $FUZ_DIR\" >> ~/.zshrc
-echo alias fze=\"fuz --names --edit --path $FUZ_DIR\" >> ~/.zshrc
 ```
 
 ```bash

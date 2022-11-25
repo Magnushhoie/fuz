@@ -84,6 +84,7 @@ Examples:
 
 
 Available options:
+  --setup            Setup Fuz aliases with custom path (.bashrc/.zshrc)
   -p, --path       Search path (default current)
   -n, --names      Search for filenames
   -e, --edit       Open with editor (vim) instead of less

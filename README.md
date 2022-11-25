@@ -43,12 +43,16 @@ cd fuz && chmod +x fuz
 
 ```bash
 # Requirements (Pick one)
-# 1. MacOS
-brew install fzf rg bat 
-# 2. Ubuntu
-sudo apt-get install fzf ripgrep bat 
-# 3. Conda
+
+# 1. MacOS, using brew: https://brew.sh/
+brew install fzf rg bat
+
+# 2. Any OS, using conda: https://conda.io/docs/user-guide/install/
 conda install -c conda-forge fzf ripgrep bat 
+
+# 3. Ubuntu
+sudo apt-get install fzf ripgrep bat 
+
 
 ```
 

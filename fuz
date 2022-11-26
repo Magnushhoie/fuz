@@ -94,15 +94,15 @@ die() {
 
 parse_params() {
   # default values of variables set from params
-  edit='0'         # e
-  open_system='0'  # o
-  create_file='0'  # c
-  maxdepth='3'     # d
-  maxlines='1000'  # m
-  maxsize='50K'    # m
-  names='0'        # n
-  fuzzysearch='-e' # f
-  setup="0"        # setup
+  edit='0'            # e
+  open_system='0'     # o
+  create_file='0'     # c
+  maxdepth='3'        # d
+  maxlines='1000'     # m
+  maxsize='50K'       # m
+  names='0'           # n
+  fuzzysearch='-e'    # f
+  setup="0"           # setup
   dir="$(realpath .)" # p
 
   while :; do
@@ -226,7 +226,7 @@ function _open_filematch() {
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      bat "$file" --pager="less +${linematch:-0}g --ignore-case" --style plain
+      bat "$file" --pager="less -R +${linematch:-0}g --ignore-case" --style plain
     fi
   fi
   exit 0

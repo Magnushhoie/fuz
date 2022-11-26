@@ -55,6 +55,7 @@ ARGS:
   <PATH>      A directory to search from
 
 OPTIONS:
+  --setup            Setup Fuz aliases with custom path (.bashrc/.zshrc)
   -p, --path         Search path (default current)
   -n, --names        Search for filenames
   -e, --edit         Open with editor (vim) instead of less
@@ -77,7 +78,7 @@ EXAMPLES:
     fuz -p notes/ bash
 
 EOF
-  exit 1
+  exit 0
 }
 
 msg() {
@@ -275,7 +276,7 @@ function main() {
   # fuz --setup: Add aliases to .zshrc/.bashrc
   if [[ $setup -eq 1 ]]; then
     add_aliases_bashrc
-    exit 1
+    exit 0
   fi
 
   # Main program
@@ -342,7 +343,7 @@ function main() {
       rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-columns 100 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
-        | fzf "$fuzzysearch" --select-1 --query "${query:- }" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

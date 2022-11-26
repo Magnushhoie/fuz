@@ -20,7 +20,7 @@
 
 </p>
 <p align="center">
-<img src="img/image.jpg" alt="Logo" width="700">
+<a href="https://asciinema.org/a/540480" target="_blank"><img src="https://asciinema.org/a/540480.svg" /></a>
 </p>
 
 Features:

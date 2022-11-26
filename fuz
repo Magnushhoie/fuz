@@ -226,7 +226,7 @@ function _open_filematch() {
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      bat "$file" --pager="less -R +${linematch:-0}g --ignore-case" --style plain
+      bat "$file" --color=always --pager="less -R +${linematch:-0}g --ignore-case" --style plain
     fi
   fi
   exit 0

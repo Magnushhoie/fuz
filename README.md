@@ -60,8 +60,6 @@ conda install -c conda-forge fzf ripgrep bat
 
 # 3. Ubuntu
 sudo apt-get install fzf ripgrep bat 
-
-
 ```
 
 ## Usage

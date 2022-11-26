@@ -20,8 +20,13 @@
 
 </p>
 <p align="center">
-<a href="https://asciinema.org/a/540480" target="_blank"><img src="https://asciinema.org/a/540480.svg" /></a>
+<a href="https://asciinema.org/a/540480" target="_blank">
+<img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz.gif?raw=true" width="500"/>
+</a>
 </p>
+
+
+
 
 Features:
 - Interactively search files and filenames with preview
@@ -39,6 +44,8 @@ git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 ./fuz --setup
 ```
+
+
 
 Example of installation here: [https://asciinema.org/a/540487](https://asciinema.org/a/540487)
 

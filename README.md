@@ -59,7 +59,10 @@ brew install fzf rg bat
 conda install -c conda-forge fzf ripgrep bat 
 
 # 3. Ubuntu
-sudo apt-get install fzf ripgrep bat 
+sudo apt-get install fzf ripgrep
+sudo apt install bat
+mkdir -p ~/.local/bin
+ln -s /usr/bin/batcat ~/.local/bin/bat
 ```
 
 ## Usage

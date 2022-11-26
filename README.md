@@ -38,8 +38,9 @@ Features:
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 ./fuz --setup
-
 ```
+
+Example of installation here: [https://asciinema.org/a/540487](https://asciinema.org/a/540487)
 
 ```bash
 # Requirements (Pick one)

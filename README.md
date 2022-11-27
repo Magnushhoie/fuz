@@ -29,13 +29,13 @@
 
 
 Features:
-- [Excels at rapidly editing/searching text notes (e.g. with Obsidian, Roam)](https://www.blopig.com/blog/2022/11/unreasonably-faster-notes-with-command-line-fuzzy-search/)
 - Interactively search files and filenames with preview
 - Opens selected file/line at search result with less / vim / system app
 - Markdown / code highlighting with bat
 - Ignores hidden directories, .gitignore, binary and large files
 - Sane defaults, search max depth, caps very large files
 - Memory mapping with ripgrep
+- [Excels at rapidly editing/searching text notes (e.g. with Obsidian, Roam)](https://www.blopig.com/blog/2022/11/unreasonably-faster-notes-with-command-line-fuzzy-search/)
 
 ## Installation
 

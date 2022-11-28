@@ -11,10 +11,10 @@
   <a href="https://github.com/Magnushhoie/fuz">
   </a>
 
-  <h1 align="center">fuz</h3>
+  <h1 align="center"><img src="https://github.com/Magnushhoie/fuz/blob/main/img/logo.png?raw=true" width="250"/></h3>
 
   <p align="center">
-    Terminal-based, file fuzzy finder for ultra-fast text search - integrated with vim
+    fuz: Terminal-based, file fuzzy finder for ultra-fast text search - integrated with vim
   </p>
 </p>
 

@@ -284,15 +284,18 @@ function main() {
 
   # fuz -c [filename]: Create new file at $dir
   if [[ $create_file -eq 1 ]]; then
+    if [[ -z $query ]]; then
+      die "No filename provided to --create [FILENAME]"
+    fi
     file="$dir/$query"
     msg "$file"
 
     # Touch and open with system if --open flag, else use vim
-    if [[ $open_system -eq 1 ]]; then
+    if [[ $edit -eq 1 ]]; then
+      vim "$file"
+    else
       touch "$file"
       open "$file"
-    else
-      vim "$file"
     fi
     exit 0
   fi

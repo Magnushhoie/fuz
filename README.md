@@ -37,7 +37,6 @@ Features:
 - Ignores hidden directories, .gitignore, binary and large files
 - Sane defaults, search max depth, caps very large files
 - Memory mapping with ripgrep
-- [Excels at rapidly editing/searching text notes (e.g. with Obsidian, Roam)](https://www.blopig.com/blog/2022/11/unreasonably-faster-notes-with-command-line-fuzzy-search/)
 
 ## Installation
 
@@ -47,10 +46,6 @@ git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 ./fuz --setup
 ```
-
-
-
-Example of installation here: [https://asciinema.org/a/540487](https://asciinema.org/a/540487)
 
 ```bash
 # Requirements (Pick one)

@@ -46,7 +46,7 @@ git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 ./fuz --setup
 
-# Usage
+# Search or edit text in setup directory
 fuz
 fuze
 ```

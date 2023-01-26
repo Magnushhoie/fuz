@@ -60,22 +60,28 @@ OPTIONS:
   -n, --names        Search for filenames
   -e, --edit         Open with editor (vim) instead of less
   -o, --open         Open with system editor
-  -c, --create       Create new file with vim
+  -c, --create       Create new file, --create <FILENAME>
   -d, --max-depth    Max search depth (3)
-  -m, --max-lines    Max line-matches per file (1000)
-  -s, --max-size     Max file-size (50K)
+  -m, --max-lines    Max lines read per file (1000)
+  -s, --max-size     Max file-size to search (50K)
   -f, --fuzzy-search Enable fuzzy instead of exact search
   -h, --help         Print this help and exit
 
 EXAMPLES:
-- Search file-contents from current directory, open with less:
+- Search file-contents, open with less:
     fuz
 
-- Search filenames (-n) from current directory, edit (-e) with vim:
+- Search filenames (-n), edit (-e) with vim:
     fuz -n -e
+
+- Search filenames (-n), open (-o) with system default editor:
+    fuz -n -o
 
 - Search file bash from path (-p) notes/
     fuz -p notes/ bash
+
+- Search 7 levels deep, read 10000 lines per files, for files up to 500 Kb
+    fuz -d 7 -m 10000 -s 500K
 
 EOF
   exit 0
@@ -199,7 +205,7 @@ function _open_filematch() {
 
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
-    msg "$file"
+    msg "$dir/$file"
 
     # Use open (MacOS) if present, else xdg-open (Linux)
     if [[ -z $(command -v xdg-open) ]]; then
@@ -214,7 +220,7 @@ function _open_filematch() {
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
-    msg "$file"
+    msg "$dir/$file"
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight
@@ -284,15 +290,18 @@ function main() {
 
   # fuz -c [filename]: Create new file at $dir
   if [[ $create_file -eq 1 ]]; then
+    if [[ -z $query ]]; then
+      die "No filename provided to --create [FILENAME]"
+    fi
     file="$dir/$query"
-    msg "$file"
+    msg "$dir/$file"
 
     # Touch and open with system if --open flag, else use vim
-    if [[ $open_system -eq 1 ]]; then
+    if [[ $edit -eq 1 ]]; then
+      vim "$file"
+    else
       touch "$file"
       open "$file"
-    else
-      vim "$file"
     fi
     exit 0
   fi

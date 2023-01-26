@@ -45,6 +45,9 @@ Features:
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 ./fuz --setup
+
+# Usage
+fuz
 ```
 
 ```bash

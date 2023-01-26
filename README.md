@@ -48,6 +48,7 @@ cd fuz && chmod +x fuz
 
 # Usage
 fuz
+fuze
 ```
 
 ```bash

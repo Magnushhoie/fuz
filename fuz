@@ -205,7 +205,7 @@ function _open_filematch() {
 
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
-    msg "$dir/$file"
+    msg "$file"
 
     # Use open (MacOS) if present, else xdg-open (Linux)
     if [[ -z $(command -v xdg-open) ]]; then

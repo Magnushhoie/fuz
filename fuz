@@ -220,7 +220,7 @@ function _open_filematch() {
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
-    msg "$dir/$file"
+    msg "$file"
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight

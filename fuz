@@ -153,7 +153,18 @@ function _check_required_programs() {
   for p in "${@}"; do
     hash "${p}" 2>&- \
       || {
-        msg " Required program \"${p}\" not installed or in search PATH."
+        msg "Please install required program \"${p}\" and put in PATH. See https://github.com/Magnushhoie/fuz"
+        msg """# 1. MacOS, using brew: https://brew.sh/
+brew install fzf rg bat
+
+# 2. Any OS, using conda: https://conda.io/docs/user-guide/install/
+conda install -c conda-forge fzf ripgrep bat 
+
+# 3. Ubuntu
+sudo apt-get install fzf ripgrep
+sudo apt install bat
+mkdir -p ~/.local/bin
+ln -s /usr/bin/batcat ~/.local/bin/bat"""
         exit 1
       }
   done

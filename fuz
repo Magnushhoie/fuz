@@ -340,6 +340,7 @@ function main() {
         --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
+    file="$dir/$file"
 
     # Open with vim or less
     _open_filematch

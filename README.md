@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Terminal-based, file fuzzy finder for ultra-fast text search and edit. Daily driver for terminal notes.
+    Terminal-based, file fuzzy finder for ultra-fast text search and edit. Daily driver for rapid note-taking.
   </p>
 </p>
 

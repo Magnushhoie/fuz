@@ -30,7 +30,7 @@ function usage() {
 Usage: $(
     basename "${BASH_SOURCE[0]}"
   ) [-cdehmnos]
-      -p path -c filename 
+      -p path -c filename
       -d num -m num -s filesize
       [filename or pattern]
 
@@ -223,11 +223,12 @@ function _open_filematch() {
     msg "$file"
 
     if [[ $edit == 1 ]]; then
-      # Vim mouse-mode, start at top, softwrap, no numbering/highlight
+      # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
       vim +":set mouse=a" +":silent! normal g;" \
         +":set number nohlsearch" \
         +":set wrap linebreak nolist" \
         +":set textwidth=0 showbreak= colorcolumn= conceallevel=0 " \
+        +":set clipboard^=unnamed,unnamedplus" \
         +"${linematch:-0}" "$file"
 
     else
@@ -255,7 +256,7 @@ function _search_file() {
     # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
     # FZF with preview, auto-select if single match
     filematch=$(
-      rg ".*[:alpha:]" "$file" --color=always --no-heading --with-filename --line-number \
+      rg ".*[:alpha:]" "$file" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \
         | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || exit 1
@@ -306,7 +307,7 @@ function main() {
     exit 0
   fi
 
-  # fuz [filename]: If only 1 file is found (n=2 levels down), open with vim (edit=1) or search it (edit=0)
+  # fuz [filename]: If only 1 file is found (n=2 levels down), open file
   # Find files matching [filename], 2 levels deep, stop after 2nd match
   # Null terminator trick for handling filepaths with whitespaces
   # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
@@ -318,17 +319,19 @@ function main() {
       | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
   ) || exit 1
 
-  # If found single match, open or search
+  # If found single match, open file.
   if [[ ${#files[@]} -eq 1 ]]; then
     file=$(realpath "${files[0]}")
 
-    if [[ $edit -eq 1 ]]; then
-      # Open file with vim or less
-      _open_filematch
-    else
-      # Search single file contents
-      _search_file
-    fi
+    _open_filematch
+
+    #if [[ $edit -eq 1 ]]; then
+    #  # Open file with vim or less
+    #  _open_filematch
+    #else
+    #  # Search single file contents
+    #  _search_file
+    #fi
   fi
 
   # fuz -e: Search filenames, open with vim
@@ -336,7 +339,7 @@ function main() {
   # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "^" --files-with-matches --max-columns 1 \
+      rg "^" ---max-columns 250 --max-columns-preview -files-with-matches --max-columns 1 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
@@ -350,7 +353,7 @@ function main() {
   # FZF with preview, auto-select if single match
   else
     filematch=$(
-      rg ".*[:alpha:]" --color=always --no-heading --with-filename --line-number --max-columns 100 \
+      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number --max-columns 100 \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"

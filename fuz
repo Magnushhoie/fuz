@@ -56,6 +56,7 @@ ARGS:
 
 OPTIONS:
   --setup            Setup Fuz aliases with custom path (fz / fze / fzo)
+  --dir              Open fuz directory
   -p, --path         Search path (default current)
   -n, --names        Search for filenames
   -e, --edit         Open with editor (vim) instead of less
@@ -107,6 +108,7 @@ parse_params() {
   maxlines='1000'     # m
   maxsize='50K'       # m
   names='0'           # n
+  opendir='0'         # dir
   fuzzysearch='-e'    # f
   setup="0"           # setup
   dir="$(realpath .)" # p
@@ -120,6 +122,7 @@ parse_params() {
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
       --setup) setup='1' ;;
+      --dir)   opendir='1' ;;
       -d | --max-depth)
         maxdepth="${2-}"
         shift
@@ -297,6 +300,14 @@ function main() {
     exit 0
   fi
 
+  # fuz --dir: Open fuz directory
+  if [[ $opendir -eq 1 ]]; then
+    file="$dir"
+    open_system='1'
+    _open_filematch
+    exit 0
+  fi
+
   # Main program
   cd "$dir" || exit 1
 
@@ -350,7 +361,7 @@ function main() {
   # select with fzf exact search, select if 1 match
   if [[ $names == 1 ]]; then
     file=$(
-      rg "^" ---max-columns 250 --max-columns-preview -files-with-matches --max-columns 1 \
+      rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
         --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
@@ -364,7 +375,7 @@ function main() {
   # FZF with preview, auto-select if single match
   else
     filematch=$(
-      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number --max-columns 100 \
+      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"

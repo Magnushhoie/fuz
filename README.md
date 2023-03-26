@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Terminal-based, file fuzzy finder for ultra-fast text search
+    Terminal-based, file fuzzy finder for ultra-fast text search and edit. Daily driver for rapid note-taking.
   </p>
 </p>
 
@@ -38,7 +38,7 @@ Features:
 - Sane defaults, search max depth, caps very large files
 - Memory mapping with ripgrep
 
-## Installation
+## Installation and usage
 
 ```bash
 # Download and install
@@ -50,6 +50,8 @@ cd fuz && chmod +x fuz
 fuz
 fuze
 ```
+
+## Requirements
 
 ```bash
 # Requirements (Pick one)
@@ -67,7 +69,7 @@ mkdir -p ~/.local/bin
 ln -s /usr/bin/batcat ~/.local/bin/bat
 ```
 
-## Usage
+## Documentation
 
 ```
 Usage: fuz [-cdehmnos]

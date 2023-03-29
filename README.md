@@ -50,7 +50,7 @@ cd fuz && chmod +x fuz
 fuz
 ```
 
-## Requirements (pick one)
+## Requirements (pick one option)
 
 ```bash
 # For MacOS, first install brew (https://brew.sh/) then run
@@ -66,6 +66,10 @@ sudo apt install bat
 mkdir -p ~/.local/bin
 ln -s /usr/bin/batcat ~/.local/bin/bat
 ```
+
+- [fzf](https://github.com/junegunn/fzf)
+- [ripgrep](https://github.com/BurntSushi/ripgrep)
+- [bat](https://github.com/sharkdp/bat)
 
 ## Documentation
 
@@ -110,11 +114,6 @@ OPTIONS:
   --dir              Print search directory to terminal
   -h, --help         Print this help and exit
 ```
-
-## Read more
-- [fzf](https://github.com/junegunn/fzf)
-- [ripgrep](https://github.com/BurntSushi/ripgrep)
-- [bat](https://github.com/sharkdp/bat)
 
 ## Compatibility
 Compatible with bash 3.2+ and zsh 5.9+. Tested on MacOS Mojave/Big Sur and Ubuntu 21.04.

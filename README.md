@@ -46,7 +46,7 @@ cd fuz && chmod +x fuz
 # Run setup and point to a directory you want to fuz
 ./fuz --setup
 
-# Interactively search any text with fuz
+# Interactively search all files with fuz
 fuz
 ```
 
@@ -70,41 +70,45 @@ ln -s /usr/bin/batcat ~/.local/bin/bat
 ## Documentation
 
 ```
-Usage: fuz [-cdehmnos]
-      -p path -c filename 
-      -d num -m num -s filesize
-      [filename or pattern]
+USAGE:
+  fuz [options] <FILENAME or SEARCH-TERMS>
 
-Fuz interactively searches the current directory, and
-opens selected file at search result with less / vim / system app.
+Fuz interactively fuzzy searches a directory and
+opens selected files at search result.
 
-Skips .gitignore, hidden, binary and large files.
+Use --edit to list files and edit in vim,
+or --open for system default app
+
+Skips large (1M+) or binary files, and hidden directories including .gitignore
+Default searches 5 directories down, follows symlinks and shows up to 50K lines per file.
 
 Project homepage: https://github.com/Magnushhoie/fuz
 
 
-Examples:
-- Search file-contents from current directory, open with less:
+EXAMPLES:
+- Search file-contents, open with less:
     fuz
 
-- Search filenames (-n) from current directory, edit (-e) with vim:
-    fuz -n -e
+- Search filenames, edit (-e) with vim:
+    fuz --edit
 
-- Search file bash.sh from path (-p) notes/
-    fuz -p notes/ bash
+- Open search directory or file in system browser
+    fuz --open
 
 
-Available options:
-  --setup          Setup Fuz aliases with custom path (fz / fze / fzo)
-  -p, --path       Search path (default current)
-  -n, --names      Search for filenames
-  -e, --edit       Open with editor (vim) instead of less
-  -o, --open       Open with system editor
-  -c, --create     Create new file with vim
-  -d, --max-depth  Max search depth (3)
-  -m, --max-lines  Max line-matches per file (1000)
-  -s, --max-size   Max file-size (50K)
-  -h, --help       Print this help and exit
+OPTIONS:
+  --setup            Set fuz default search directory in .zsh/.bashrc
+  -p, --path         Directory to search
+  -o, --open         Open search directory or file with system default application
+  -e, --edit         Open file with vim editor (instead of 'less')
+  -c, --create       Create new file in search directory: --create <FILENAME>
+  -n, --names        Only show filenames
+  -d, --max-depth    Max search depth (5)
+  -m, --max-lines    Max lines read per file (50000)
+  -s, --max-size     Max file-size to search (1M)
+  -f, --fuzzy-search Enable fuzzy instead of exact search
+  --dir              Print search directory to terminal
+  -h, --help         Print this help and exit
 ```
 
 ## Read more

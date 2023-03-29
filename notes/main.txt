@@ -1,19 +1,16 @@
-## main.txt (main note file)
+## main.txt ##
+
+__your notes here__
+
 
 __less hotkeys__
-u   # Scroll up half-page
-d   # Scroll down half-page
-q   # quit
+u   # Move up (half-page)
+d   # Move down (half-page)
 G   # Go to end
 g   # Go to start
 /   # Search within file
+q   # Quit
 
-__Vim movements__
-Ctrl + d  # Down
-Ctrl + u  # Up
-G         # Go to end
-g         # Go to start
-/         # Search within file
 
 __Vim hotkeys and commands__
 <Escape>  # Exit insert mode
@@ -21,6 +18,12 @@ i         # Insert mode, can enter text
 :q!       # Quit forcibly
 :wq       # Write and quit
 Ctrl + r  # Select text
+Ctrl + d  # Down
+Ctrl + u  # Up
+G         # Go to end
+g         # Go to start
+/         # Search within file
+
 
 __terminal select and copy text__
 Select and copy text: Ctrl + r

@@ -27,62 +27,43 @@ export FZF_DEFAULT_OPTS="--reverse --inline-info --ansi"
 # 2. section: functions
 function usage() {
   cat <<EOF #
-Usage: $(
-    basename "${BASH_SOURCE[0]}"
-  ) [-cdehmnos]
-      -p path -c filename
-      -d num -m num -s filesize
-      [filename or pattern]
+USAGE:
+  fuz [options] <FILENAME or SEARCH-TERMS>
 
-Fuz interactively searches the current directory, and
-opens selected file at search result with less / vim / system app.
+Fuz interactively fuzzy searches a directory and
+opens selected files at search result.
 
-Skips .gitignore, hidden, binary and large files.
+Use --edit to list files and edit in vim,
+or --open for system default app
+
+Skips large (1M+) or binary files, and hidden directories including .gitignore
+Default searches 5 directories down, follows symlinks and shows up to 50K lines per file.
 
 Project homepage: https://github.com/Magnushhoie/fuz
 
-USAGE:
-  fuz
-  fuz --edit
-  fuz --names
-  fuz [options] <FILENAME or PATTERN>
-  fuz --path <PATH>
-  fuz --create <FILENAME>
-
-ARGS:
-  <FILENAME>  A filename to search, partial match
-  <PATTERN>   Search pattern
-  <PATH>      A directory to search from
-
 OPTIONS:
-  --setup            Setup Fuz aliases with custom path (fz / fze / fzo)
-  --dir              Open fuz directory
-  -p, --path         Search path (default current)
-  -n, --names        Search for filenames
-  -e, --edit         Open with editor (vim) instead of less
-  -o, --open         Open with system editor
-  -c, --create       Create new file, --create <FILENAME>
-  -d, --max-depth    Max search depth (3)
-  -m, --max-lines    Max lines read per file (1000)
-  -s, --max-size     Max file-size to search (50K)
+  --setup            Set fuz default search directory in .zsh/.bashrc
+  -p, --path         Directory to search
+  -o, --open         Open search directory or file with system default application
+  -e, --edit         Open file with vim editor (instead of 'less')
+  -c, --create       Create new file in search directory: --create <FILENAME>
+  -n, --names        Only show filenames
+  -d, --max-depth    Max search depth (5)
+  -m, --max-lines    Max lines read per file (50000)
+  -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
+  --dir              Print search directory to terminal
   -h, --help         Print this help and exit
 
 EXAMPLES:
 - Search file-contents, open with less:
     fuz
 
-- Search filenames (-n), edit (-e) with vim:
-    fuz -n -e
+- Search filenames, edit (-e) with vim:
+    fuz -e
 
-- Search filenames (-n), open (-o) with system default editor:
-    fuz -n -o
-
-- Search file bash from path (-p) notes/
-    fuz -p notes/ bash
-
-- Search 7 levels deep, read 10000 lines per files, for files up to 500 Kb
-    fuz -d 7 -m 10000 -s 500K
+- Open search directory or file in system browser
+    fuz -o
 
 EOF
   exit 0
@@ -104,11 +85,11 @@ parse_params() {
   edit='0'            # e
   open_system='0'     # o
   create_file='0'     # c
-  maxdepth='3'        # d
-  maxlines='1000'     # m
-  maxsize='50K'       # m
+  maxdepth='5'        # d
+  maxlines='50000'    # m
+  maxsize='1M'        # m
   names='0'           # n
-  opendir='0'         # dir
+  printdir='0'         # dir
   fuzzysearch='-e'    # f
   setup="0"           # setup
   dir="$(realpath .)" # p
@@ -116,13 +97,13 @@ parse_params() {
   while :; do
     case "${1-}" in
       -h | --help) usage ;;
-      -e | --edit) edit='1' ;;
+      -e | --edit) edit='1' names='1' ;;
       -o | --open) open_system='1' ;;
       -c | --create) create_file='1' ;;
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
+      --dir)   printdir='1' ;;
       --setup) setup='1' ;;
-      --dir)   opendir='1' ;;
       -d | --max-depth)
         maxdepth="${2-}"
         shift
@@ -174,34 +155,36 @@ ln -s /usr/bin/batcat ~/.local/bin/bat"""
 }
 
 #######################################
-# Adds aliases fuz, fz fze, fzo to .bashrc/.zshrc
-# with user inputted path, if not present
+# Adds aliases fuz with new search path .bashrc/.zshrc
 # Globals:
 #   file: SCRIPT_PATH
 # Arguments:
 #   None
 #######################################
-function add_aliases_bashrc() {
-  read -rp "Add fuz aliases with path to ~/.bashrc and ~/.zshrc? y/n"$'\n' -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
+function add_aliases_zsh_bashrc() {
+  read -rp $'\n'"New default search directory? (default $SCRIPT_DIR/notes/)"$'\n' search_directory
 
-    read -rp $'\n'"Please specify search directory (default $SCRIPT_DIR/notes/):"$'\n' filepath
-    FUZ_DIR=$(realpath "${filepath:-"$SCRIPT_DIR"/notes}")
+  # Continue if search directory provided
+  if [[ ! -z $search_directory ]]; then
 
-    echo -e "Adding aliases to .bashrc and ~/.zshrc ..."
+    FUZ_DIR=$(realpath "${search_directory:-"$SCRIPT_DIR"/notes}")
+
+    echo -e "\nNew directory: $FUZ_DIR"
+    read -rp "fuz will now by default search the given directory. Confirm with y/n"$'\n' -n 1 -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+      exit 0
+    fi
+
+    echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
     BASHRC=$(echo -e "$HOME"/.bashrc)
     ZSHRC=$(echo -e "$HOME"/.zshrc)
-    LINE0=$(echo -e alias fuz=\'$SCRIPT_PATH\') && echo "$LINE0"
-    LINE1=$(echo -e alias fz=\'fuz --path \"$FUZ_DIR\"\') && echo "$LINE1"
-    LINE2=$(echo -e alias fze=\'fuz --edit --names --path \"$FUZ_DIR\"\') && echo "$LINE2"
-    LINE3=$(echo -e alias fzo=\'fuz --open --names --path \"$FUZ_DIR\"\') && echo "$LINE3"
+    LINE=$(echo -e alias fuz=\'$SCRIPT_PATH --path \"$FUZ_DIR\"\') && echo "$LINE"
 
     for file in "$BASHRC" "$ZSHRC"; do
-      for line in "$LINE0" "$LINE1" "$LINE2" "$LINE3"; do
-        grep -qF -- "$line" "$file" || echo -e "$line" >>"$file"
-      done
+        grep -qF -- "$LINE" "$file" || echo -e "$LINE" >>"$file"
     done
-    echo -e "Please restart your shell for changes to take effect"
+
+    echo -e "\nPlease restart your shell for changes to take effect, then run fuz\n"
   fi
 }
 
@@ -296,15 +279,21 @@ function main() {
 
   # fuz --setup: Add aliases to .zshrc/.bashrc
   if [[ $setup -eq 1 ]]; then
-    add_aliases_bashrc
+    add_aliases_zsh_bashrc
     exit 0
   fi
 
-  # fuz --dir: Open fuz directory
-  if [[ $opendir -eq 1 ]]; then
+  # fuz --open <no_arguments>: Open search directory directory
+  if [[ $open_system -eq 1 ]] && [[ -z "$query" ]]; then
+    # Set "file" to directory to open with system default (Finder in MacOS)
     file="$dir"
-    open_system='1'
     _open_filematch
+    exit 0
+  fi
+
+  # fuz --dir: Print search directory path
+  if [[ $printdir -eq 1 ]]; then
+    echo "$dir"
     exit 0
   fi
 
@@ -346,19 +335,11 @@ function main() {
     file=$(realpath "${files[0]}")
 
     _open_filematch
-
-    #if [[ $edit -eq 1 ]]; then
-    #  # Open file with vim or less
-    #  _open_filematch
-    #else
-    #  # Search single file contents
-    #  _search_file
-    #fi
   fi
 
   # fuz -e: Search filenames, open with vim
-  # Ripgrep for filenames only
-  # select with fzf exact search, select if 1 match
+  # Uses ripgrep and fzf exact search.
+  # FZF auto-selects if single match
   if [[ $names == 1 ]]; then
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
@@ -371,8 +352,8 @@ function main() {
     _open_filematch
 
   # fuz: Search file-contents, open with less
-  # Ripgrep w/ line no. and names, ignoring binary files and .git
-  # FZF with preview, auto-select if single match
+  # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
+  # FZF shows file-content previews. Auto-selects if single match
   else
     filematch=$(
       rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \

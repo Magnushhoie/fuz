@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Terminal-based, file fuzzy finder for ultra-fast text search and edit. Daily driver for rapid note-taking.
+    Fuzzy search your notes in the terminal. Ultra-fast search and edit with ripgrep and vim. Personally used for 4+ years.
   </p>
 </p>
 

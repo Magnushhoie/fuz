@@ -27,16 +27,14 @@
 </a>
 </p>
 
-
-
-
-Features:
-- Interactively search files and filenames with preview
-- Opens selected file/line at search result with less / vim / system app
-- Markdown / code highlighting with bat
-- Ignores hidden directories, .gitignore, binary and large files
-- Sane defaults, search max depth, caps very large files
-- Memory mapping with ripgrep
+Why use Fuz?
+- Point to a directory of text files
+- Fuz instantly and interactively returns search matches (see above)
+- Files are opened in your terminal or system app
+- Supports markdown and code highlighting
+- File contents are memory mapped for faster results
+- Cleverly ignores large binary files and hidden directories
+- Works well with Obsidian/ Roam like note-taking apps and project code directories
 
 ## Installation and usage
 
@@ -44,27 +42,27 @@ Features:
 # Download and install
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
+
+# Run setup and point to a directory you want to fuz
 ./fuz --setup
 
-# Search or edit text in setup directory
+# Interactively search any text with fuz
 fuz
-fuze
 ```
 
-## Requirements
+## Requirements (pick one)
 
 ```bash
-# Requirements (Pick one)
-
-# 1. MacOS, using brew: https://brew.sh/
+# For MacOS, first install brew (https://brew.sh/) then run
 brew install fzf rg bat
 
-# 2. Any OS, using conda: https://conda.io/docs/user-guide/install/
+# Alternatively use conda: https://conda.io/docs/user-guide/install/
 conda install -c conda-forge fzf ripgrep bat 
 
-# 3. Ubuntu
+# On Ubuntu (requires sudo)
 sudo apt-get install fzf ripgrep
 sudo apt install bat
+# Batcat should be aliased to bat to work with fuz
 mkdir -p ~/.local/bin
 ln -s /usr/bin/batcat ~/.local/bin/bat
 ```

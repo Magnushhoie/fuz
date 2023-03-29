@@ -1,5 +1,8 @@
 ## BASH commands ##
 
+__your notes here__
+
+
 __bash commandline hotkeys__
 Arrow up/down: show previous/next commands from history
 # Movement

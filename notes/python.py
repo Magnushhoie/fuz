@@ -1,5 +1,8 @@
 ## Python commands ##
 
+__your notes here__
+
+
 __python run from bash terminal__
 # run python code from bash
 python -c "print("Hello world!")"

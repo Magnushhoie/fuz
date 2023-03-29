@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Fuzzy search your notes in the terminal. Ultra-fast search and edit with ripgrep and vim. Personally used for 4+ years.
+    Fuzzy search your notes in the terminal. Ultra-fast text search and edit using ripgrep and vim. Personally used for 4+ years.
   </p>
 </p>
 

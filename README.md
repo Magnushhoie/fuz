@@ -30,7 +30,7 @@
 Why use Fuz?
 - Point to a directory of text files
 - Fuz instantly and interactively returns search matches (see above)
-- Files are opened in your terminal or system app
+- Search results are opened directly in terminal (or preferred app)
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories

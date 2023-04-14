@@ -70,7 +70,7 @@ EOF
 }
 
 msg() {
-  echo >&2 -e "${1-}"
+  echo >&2 -e "$*"
 }
 
 die() {
@@ -89,7 +89,7 @@ parse_params() {
   maxlines='50000'    # m
   maxsize='1M'        # m
   names='0'           # n
-  printdir='0'         # dir
+  printdir='0'        # dir
   fuzzysearch='-e'    # f
   setup="0"           # setup
   dir="$(realpath .)" # p
@@ -200,10 +200,12 @@ function add_aliases_zsh_bashrc() {
 #######################################
 function _open_filematch() {
 
+  # Return file with filenumber (can copy-paste open at line with vim)
+  msg "\"$file\"" "+${linematch-0}"
+
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
-    msg "$file"
-
+   
     # Use open (MacOS) if present, else xdg-open (Linux)
     if [[ -z $(command -v xdg-open) ]]; then
       open "$file"
@@ -217,7 +219,6 @@ function _open_filematch() {
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
-    msg "$file"
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
@@ -236,38 +237,6 @@ function _open_filematch() {
   exit 0
 }
 
-#######################################
-# Searches specific file, select linematch, open with _open_filematch
-# Globals:
-#   file: File to open, fullpath
-#   dir: Search directory
-#   STRING2ARG_FILE: Functions for for FZF preview
-# Arguments:
-#   None
-#######################################
-function _search_file() {
-  if [[ -f $file ]]; then
-
-    # Ripgrep file for lines with starting characters
-    # sed interpret byte-sequence as 7-bit ASCII / POSIX:
-    # https://www.gnu.org/software/sed/manual/html_node/Locale-Considerations.html
-    # FZF with preview, auto-select if single match
-    filematch=$(
-      rg ".*[:alpha:]" "$file" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \
-        | LC_ALL=C sed "s;$dir/;;" 2>/dev/null \
-        | fzf "$fuzzysearch" --select-1 --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
-    ) || exit 1
-
-    # Extract filename and linenumber from match
-    file=$(cut -d":" -f1 <<<"$filematch")
-    file="$dir/$file"
-    linematch=$(cut -d":" -f2 <<<"$filematch")
-
-    # Open with vim or less
-    _open_filematch
-  fi
-  exit 0
-}
 
 function main() {
 
@@ -354,12 +323,13 @@ function main() {
   # fuz: Search file-contents, open with less
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
   # FZF shows file-content previews. Auto-selects if single match
+  # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
   else
     filematch=$(
       rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
-        | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf $fuzzysearch --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

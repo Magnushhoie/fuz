@@ -104,9 +104,9 @@ OPTIONS:
   --setup            Set fuz default search directory in .zsh/.bashrc
   -p, --path         Directory to search
   -o, --open         Open search directory or file with system default application
-  -e, --edit         Open file with vim editor (instead of 'less')
-  -c, --create       Create new file in search directory: --create <FILENAME>
+  -e, --edit         Open file with vim editor (instead of 'less'), enables --names option
   -n, --names        Only show filenames
+  -c, --create       Create new file in search directory: --create <FILENAME>
   -d, --max-depth    Max search depth (5)
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)

@@ -252,17 +252,10 @@ function main() {
     exit 0
   fi
 
-  # fuz --open <no_arguments>: Open search directory directory
-  if [[ $open_system -eq 1 ]] && [[ -z "$query" ]]; then
-    # Set "file" to directory to open with system default (Finder in MacOS)
-    file="$dir"
-    _open_filematch
-    exit 0
-  fi
-
-  # fuz --dir: Print search directory path
+  # fuz --dir: OPen search directory (and print path)
   if [[ $printdir -eq 1 ]]; then
     echo "$dir"
+    open "$dir"
     exit 0
   fi
 

@@ -75,7 +75,7 @@ ln -s /usr/bin/batcat ~/.local/bin/bat
 
 ```
 USAGE:
-  fuz [options] <FILENAME or SEARCH-TERMS>
+  fuz [options] <FILENAME and/or SEARCH-TERMS>
 
 Fuz interactively fuzzy searches a directory and
 opens selected files at search result.

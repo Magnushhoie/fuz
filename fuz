@@ -52,7 +52,7 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
-  --dir              Print search directory to terminal
+  --dir              Print and open search directory
   -h, --help         Print this help and exit
 
 EXAMPLES:

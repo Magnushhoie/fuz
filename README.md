@@ -111,12 +111,12 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
-  --dir              Print search directory to terminal
+  --dir              Print and open search directory
   -h, --help         Print this help and exit
 ```
 
 ## Compatibility
-Compatible with bash 3.2+ and zsh 5.9+. Tested on MacOS Mojave/Big Sur and Ubuntu 21.04.
+Compatible with bash 3.2+ and zsh 5.9+. Tested on Ubuntu 21.04 and MacOS Monterey/Mojave/Big Sur.
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

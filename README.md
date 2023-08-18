@@ -50,6 +50,19 @@ cd fuz && chmod +x fuz
 fuz
 ```
 
+## Search your MacOSX Notes
+
+```bash
+# Exports notes to text in ~/_macosx_notes
+osascript -l JavaScript macosx_notes2txt.AppleScript
+
+# Setup alias to point to the directory in .bashrc/.zshrc
+# Then use 'nfz' to fuz the ~/_macosx_notes directory
+echo 'alias nfz="fuz -p ~/_macosx_notes"' >> ~/.zshrc
+echo 'alias nfze="fuz -e -p ~/_macosx_notes"' >> ~/.zshrc
+```
+
+
 ## Requirements (pick one option)
 
 ```bash

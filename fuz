@@ -142,7 +142,7 @@ function _check_required_programs() {
 brew install fzf rg bat
 
 # 2. Any OS, using conda: https://conda.io/docs/user-guide/install/
-conda install -c conda-forge fzf ripgrep bat 
+conda install -c conda-forge fzf ripgrep bat
 
 # 3. Ubuntu
 sudo apt-get install fzf ripgrep
@@ -176,12 +176,14 @@ function add_aliases_zsh_bashrc() {
     fi
 
     echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
-    BASHRC=$(echo -e "$HOME"/.bashrc)
-    ZSHRC=$(echo -e "$HOME"/.zshrc)
-    LINE=$(echo -e alias fuz=\'$SCRIPT_PATH --path \"$FUZ_DIR\"\') && echo "$LINE"
+    LINE1="alias fuz='$SCRIPT_PATH --path \"$FUZ_DIR\"'"
+    LINE2="alias fz='fuz'"
+    LINE3="alias fze='fuz -e'"
 
-    for file in "$BASHRC" "$ZSHRC"; do
-        grep -qF -- "$LINE" "$file" || echo -e "$LINE" >>"$file"
+    for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
+      for LINE in "$LINE1" "$LINE2" "$LINE3"; do
+        grep -qF -- "$LINE" "$FILE" || echo -e "$LINE" >>"$FILE"
+      done
     done
 
     echo -e "\nPlease restart your shell for changes to take effect, then run fuz\n"
@@ -205,7 +207,7 @@ function _open_filematch() {
 
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
-   
+
     # Use open (MacOS) if present, else xdg-open (Linux)
     if [[ -z $(command -v xdg-open) ]]; then
       open "$file"

@@ -179,8 +179,9 @@ function add_aliases_zsh_bashrc() {
   LINE2="alias fz='fuz'"
   LINE3="alias fze='fuz -e'"
 
-  for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
-    for LINE in "$LINE1" "$LINE2" "$LINE3"; do
+  for LINE in "$LINE1" "$LINE2" "$LINE3"; do
+    echo $LINE
+    for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
       grep -qF -- "$LINE" "$FILE" || echo -e "$LINE" >>"$FILE"
     done
   done

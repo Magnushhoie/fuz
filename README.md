@@ -50,10 +50,10 @@ cd fuz && chmod +x fuz
 fuz
 ```
 
-## Search your MacOSX Notes
+## Search your Apple Notes (MacOSX)
 
 ```bash
-# Exports notes to text in ~/_macosx_notes
+# Exports Apple Notes to text in ~/_macosx_notes
 osascript -l JavaScript macosx_notes2txt.AppleScript
 
 # Setup alias to point to the directory in .bashrc/.zshrc

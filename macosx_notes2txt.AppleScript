@@ -1,3 +1,4 @@
+// Based on https://macmost.com/export-all-of-the-notes-on-your-mac-using-a-script.html
 // set things up
 var app = Application.currentApplication();
 app.includeStandardAdditions = true;

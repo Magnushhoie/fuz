@@ -50,19 +50,6 @@ cd fuz && chmod +x fuz
 fuz
 ```
 
-## Search your Apple Notes (MacOSX)
-
-```bash
-# Exports Apple Notes to text in ~/_macosx_notes
-osascript -l JavaScript macosx_notes2txt.AppleScript
-
-# Setup alias to point to the directory in .bashrc/.zshrc
-# Then use 'nfz' to fuz the ~/_macosx_notes directory
-echo 'alias nfz="fuz -p ~/_macosx_notes"' >> ~/.zshrc
-echo 'alias nfze="fuz -e -p ~/_macosx_notes"' >> ~/.zshrc
-```
-
-
 ## Requirements (pick one option)
 
 ```bash
@@ -126,6 +113,18 @@ OPTIONS:
   -f, --fuzzy-search Enable fuzzy instead of exact search
   --dir              Print and open search directory
   -h, --help         Print this help and exit
+```
+
+## Search your Apple Notes (MacOSX)
+
+```bash
+# Exports Apple Notes to text in ~/_macosx_notes
+osascript -l JavaScript macosx_notes2txt.AppleScript
+
+# Setup alias to point to the directory in .bashrc/.zshrc
+# Then use 'nfz' to fuz the ~/_macosx_notes directory
+echo 'alias nfz="fuz -p ~/_macosx_notes"' >> ~/.zshrc
+echo 'alias nfze="fuz -e -p ~/_macosx_notes"' >> ~/.zshrc
 ```
 
 ## Compatibility

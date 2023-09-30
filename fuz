@@ -52,6 +52,8 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
+  --sorttime         Sort files by date modified, preserve line order (single threaded, slow)
+  --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
   -h, --help         Print this help and exit
 
@@ -97,12 +99,14 @@ parse_params() {
   while :; do
     case "${1-}" in
       -h | --help) usage ;;
-      -e | --edit) edit='1' names='1' ;;
+      -e | --edit) edit='1' names='1' rg_sort='--sortr modified' fzf_sort='--no-sort' ;;
       -o | --open) open_system='1' ;;
       -c | --create) create_file='1' ;;
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
-      --dir)   printdir='1' ;;
+      --dir) printdir='1' ;;
+      --vimsearch) edit='1' names='0' ;;
+      --sorttime) rg_sort='--sortr modified' fzf_sort='--no-sort' ;;
       --setup) setup='1' ;;
       -d | --max-depth)
         maxdepth="${2-}"
@@ -180,7 +184,7 @@ function add_aliases_zsh_bashrc() {
   LINE3="alias fze='fuz -e'"
 
   for LINE in "$LINE1" "$LINE2" "$LINE3"; do
-    echo $LINE
+    echo "$LINE"
     for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
       grep -qF -- "$LINE" "$FILE" || echo -e "$LINE" >>"$FILE"
     done
@@ -237,7 +241,6 @@ function _open_filematch() {
   fi
   exit 0
 }
-
 
 function main() {
 
@@ -306,8 +309,12 @@ function main() {
   if [[ $names == 1 ]]; then
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
-        --max-depth "$maxdepth" --max-filesize "$maxsize" 2>/dev/null \
-        | fzf "$fuzzysearch" --select-1 --query "${query-}" --preview="bat --color=always {}"
+        --max-depth "$maxdepth" --max-filesize "$maxsize" \
+        ${rg_sort:-} \
+        2>/dev/null \
+        | fzf "$fuzzysearch" --select-1 --query "${query-}" \
+          ${fzf_sort:-} \
+          --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
 
@@ -320,10 +327,16 @@ function main() {
   # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
   else
     filematch=$(
-      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview --color=always --no-heading --with-filename --line-number \
-        --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" 2>/dev/null \
+      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview \
+        --color=always --no-heading --with-filename --line-number \
+        --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" \
+        ${rg_sort:-} \
+        2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
-        | fzf $fuzzysearch --select-1 --query "${query-}" --preview="source $STRING2ARG_FILE; cd \"$dir\"; string2arg \"$dir\"/{}"
+        | fzf "${fuzzysearch}" --select-1 --query "${query-}" \
+          ${fzf_sort:-} \
+          --preview="source $STRING2ARG_FILE \
+        ; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

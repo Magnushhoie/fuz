@@ -180,8 +180,8 @@ function add_aliases_zsh_bashrc() {
   # Add aliases to .bashrc / .zshrc
   echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
   LINE1="alias fuz='$SCRIPT_PATH --path \"$FUZ_DIR\"'"
-  LINE2="alias fz='fuz'"
-  LINE3="alias fze='fuz -e'"
+  LINE2="alias fz='fuz --sorttime'"
+  LINE3="alias fze='fuz --edit'"
 
   for LINE in "$LINE1" "$LINE2" "$LINE3"; do
     echo "$LINE"

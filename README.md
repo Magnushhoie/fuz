@@ -31,6 +31,7 @@ Why use Fuz?
 - Point to a directory of text files
 - Fuz instantly and interactively returns search matches (see above)
 - Search results are opened directly in terminal (or preferred app)
+- Chronologically sorts results
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
@@ -96,7 +97,7 @@ EXAMPLES:
 - Search filenames, edit (-e) with vim:
     fuz --edit
 
-- Open search directory or file in system browser
+- Open results with default text editor
     fuz --open
 
 
@@ -111,6 +112,8 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
+  --sorttime         Sort files by date modified, preserve line order (single threaded, slow)
+  --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
   -h, --help         Print this help and exit
 ```

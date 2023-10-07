@@ -1,4 +1,5 @@
 archive/
+.DS_Store
 old/
 tmp/
 .DS_store

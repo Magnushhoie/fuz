@@ -5,7 +5,7 @@ string2arg() {
     export arg_filename=$(cut -d":" -f1 <<< "$*");
     export arg_linenum=$(cut -d":" -f2 <<< "$*");
 
-    min_offset=12
+    min_offset=10
     let max_offset="min_offset*3"
     min=0
     if (($min_offset < $arg_linenum)); then

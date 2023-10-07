@@ -30,7 +30,6 @@
 Why use Fuz?
 - Point to a directory of text files
 - Fuz instantly and interactively returns search matches (see above)
-- Search results are opened directly in terminal (or preferred app)
 - Chronologically sorts results
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results

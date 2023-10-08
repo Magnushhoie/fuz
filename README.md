@@ -36,6 +36,9 @@ Why use Fuz?
 - Cleverly ignores large binary files and hidden directories
 - Works well with Obsidian / Roam / Apple Notes like note-taking apps, managing code snippets and project notes
 
+## Try it out!
+Try it out in your browser on repl.it: [https://replit.com/@MagnusHaraldson/fuz#main.sh](https://replit.com/@MagnusHaraldson/fuz#main.sh)
+
 ## Installation and usage
 
 ```bash

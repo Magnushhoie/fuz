@@ -97,7 +97,7 @@ EXAMPLES:
     fuz
 
 - Search specific path
-    fuz/fuz --path DIRECTORY
+    fuz --path DIRECTORY
 
 - Search filenames to edit with vim:
     fuz --edit

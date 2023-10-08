@@ -206,7 +206,7 @@ function add_aliases_zsh_bashrc() {
 function _open_filematch() {
 
   # Return file with filenumber (can copy-paste open at line with vim)
-  msg "\"$file\"" "+${linematch-0}"
+  msg "\"$file\"" "+${linematch:-0}"
 
   # If open system editor (-o) flag, use open (also valid for directories)
   if [[ $open_system -eq 1 ]]; then
@@ -236,7 +236,7 @@ function _open_filematch() {
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      lineopen=$(( linematch >= 10 ? linematch - 10 : 0 ))
+      lineopen=$(( ${linematch:-0} >= 10 ? ${linematch:-0} - 10 : 0 ))
       bat "$file" --color=always --style plain \
       --highlight-line "${linematch:-0}" \
       --pager="less -R +${lineopen:-0}g --ignore-case"

@@ -24,11 +24,11 @@
 <p align="center">
 <a href="https://asciinema.org/a/540480" target="_blank">
 <img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz.gif?raw=true" width="500"/>
+  <p align="center">
+    Try it in your browser on <a href="https://replit.com/@MagnusHaraldson/fuz">replit.com/@MagnusHaraldson/fuz</a>
+  </p>
 </a>
 </p>
-
-## Try it out!
-Try it out in your browser on repl.it: [https://replit.com/@MagnusHaraldson/fuz#main.sh](https://replit.com/@MagnusHaraldson/fuz#main.sh)
 
 Why use Fuz?
 - Point to a directory of text files

@@ -167,12 +167,12 @@ ln -s /usr/bin/batcat ~/.local/bin/bat"""
 #######################################
 function add_aliases_zsh_bashrc() {
   # Set default search directory
-  read -rp $''"Set default search directory below (default $SCRIPT_DIR/notes/)"$'\n' search_directory
+  read -rp $''"Set fuz search directory below (default $SCRIPT_DIR/notes/):"$'\n' search_directory
   FUZ_DIR=$(realpath "${search_directory:-"$SCRIPT_DIR"/notes}")
   echo -e "New directory: $FUZ_DIR"
 
   # Continue?
-  read -rp "fuz will now by default search the given directory. Confirm with y/n"$'\n' -n 1 -r
+  read -rp "fuz will now by default search the above directory. Confirm with y/n"$'\n' -n 1 -r
   if [[ $REPLY =~ ^[Nn]$ ]]; then
     exit 0
   fi
@@ -186,7 +186,9 @@ function add_aliases_zsh_bashrc() {
   for LINE in "$LINE1" "$LINE2" "$LINE3"; do
     echo "$LINE"
     for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
-      grep -qF -- "$LINE" "$FILE" || echo -e "$LINE" >>"$FILE"
+      if [[ -f "$FILE" ]]; then
+        grep -qF -- "$LINE" "$FILE" || echo -e "$LINE" >>"$FILE"
+      fi
     done
   done
 

@@ -93,14 +93,20 @@ Project homepage: https://github.com/Magnushhoie/fuz
 
 
 EXAMPLES:
-- Search file-contents, open with less:
+- Search text from default path
     fuz
 
-- Search filenames, edit (-e) with vim:
+- Search specific path
+    fuz/fuz --path DIRECTORY
+
+- Search filenames to edit with vim:
     fuz --edit
 
-- Open results with default text editor
+- Open matches with system default text editor
     fuz --open
+
+- Chronologically sort results
+    fuz --sorttime
 
 
 OPTIONS:

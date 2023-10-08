@@ -58,14 +58,20 @@ OPTIONS:
   -h, --help         Print this help and exit
 
 EXAMPLES:
-- Search file-contents, open with less:
+- Search text from default path
     fuz
 
-- Search filenames, edit (-e) with vim:
-    fuz -e
+- Search specific path
+    fuz/fuz --path DIRECTORY
 
-- Open search directory or file in system browser
-    fuz -o
+- Search filenames to edit with vim:
+    fuz --edit
+
+- Open matches with system default text editor
+    fuz --open
+
+- Chronologically sort results
+    fuz --sorttime
 
 EOF
   exit 0

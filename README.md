@@ -27,6 +27,9 @@
 </a>
 </p>
 
+## Try it out!
+Try it out in your browser on repl.it: [https://replit.com/@MagnusHaraldson/fuz#main.sh](https://replit.com/@MagnusHaraldson/fuz#main.sh)
+
 Why use Fuz?
 - Point to a directory of text files
 - Fuz instantly and interactively returns search matches (see above)
@@ -35,9 +38,6 @@ Why use Fuz?
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
 - Works well with Obsidian / Roam / Apple Notes like note-taking apps, managing code snippets and project notes
-
-## Try it out!
-Try it out in your browser on repl.it: [https://replit.com/@MagnusHaraldson/fuz#main.sh](https://replit.com/@MagnusHaraldson/fuz#main.sh)
 
 ## Installation and usage
 

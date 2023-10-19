@@ -244,7 +244,7 @@ function _open_filematch() {
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      lineopen=$(( ${linematch:-0} >= 10 ? ${linematch:-0} - 10 : 0 ))
+      lineopen=$(( ${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0 ))
       bat "$file" --color=always --style plain \
       --highlight-line "${linematch:-0}" \
       --pager="less -R +${lineopen:-0}g --ignore-case"

@@ -43,8 +43,8 @@ Default searches 5 directories down, follows symlinks and shows up to 50K lines 
 Project homepage: https://github.com/Magnushhoie/fuz
 
 KEY BINDINGS:
-  CTRL+E             Edit in vim
-  CTRL+F             View with less
+  CTRL+O             Open in vim
+  CTRL+L             View with less
   CTRL+J             MOVE down
   CTRL+K             MOVE up
 
@@ -326,7 +326,7 @@ function main() {
   # fuz -e: Search filenames, open with vim
   # Uses ripgrep and fzf exact search.
   # FZF auto-selects if single match
-  # Bindings: Ctrl + E to open with vim, Ctrl + F to open with less
+  # Bindings: Ctrl + O to open with vim, Ctrl + L to open with less
   if [[ $names == 1 ]]; then
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
@@ -335,9 +335,9 @@ function main() {
         2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'Press CTRL+E to edit, CTRL+F to view' \
-          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
-          --bind "ctrl-f:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
+          --header 'Press CTRL+O to edit, CTRL+L to view, CTRL+J/K down/up' \
+          --bind "ctrl-o:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
           --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
@@ -349,7 +349,7 @@ function main() {
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
   # FZF shows file-content previews. Auto-selects if single match
   # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
-  # Bindings: Ctrl + E to open with vim, Ctrl + F to open with less
+  # Bindings: Ctrl + O to open with vim, Ctrl + L to open with less
   else
     filematch=$(
       rg ".*[:alpha:]" --max-columns 250 --max-columns-preview \
@@ -360,9 +360,9 @@ function main() {
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "${fuzzysearch}" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'Press CTRL+E to edit, CTRL+F to view' \
-          --bind "ctrl-f:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
-          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --header 'Press CTRL+O to edit, CTRL+L to view, CTRL+J/K for down/up' \
+          --bind "ctrl-o:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --preview="source $FUZ_SCRIPTS_FILE \
         ; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)

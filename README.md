@@ -105,6 +105,11 @@ EXAMPLES:
 - Chronologically sort results
     fuz --sorttime
 
+KEY BINDINGS:
+  CTRL+O             Open in vim
+  CTRL+L             View with less
+  CTRL+J             MOVE down
+  CTRL+K             MOVE up
 
 OPTIONS:
   --setup            Set fuz default search directory in .zsh/.bashrc

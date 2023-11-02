@@ -19,6 +19,7 @@ SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
 declare -r SCRIPT_DIR
 declare -r SCRIPT_PATH
 declare -r FUZ_SCRIPTS_FILE="$SCRIPT_DIR/fuz_scripts.sh"
+declare -r FUZ_SCRIPTS_FILE="$SCRIPT_DIR/fuz_scripts.sh"
 
 # FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"

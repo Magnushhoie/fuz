@@ -106,8 +106,8 @@ EXAMPLES:
     fuz --sorttime
 
 KEY BINDINGS:
-  CTRL+E             Edit in vim
-  CTRL+F             View with less
+  CTRL+O             Open in vim
+  CTRL+L             View with less
   CTRL+J             MOVE down
   CTRL+K             MOVE up
 

@@ -18,7 +18,7 @@ SCRIPT_DIR="$(
 SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
 declare -r SCRIPT_DIR
 declare -r SCRIPT_PATH
-declare -r STRING2ARG_FILE="$SCRIPT_DIR/string2arg.sh"
+declare -r FUZ_SCRIPTS_FILE="$SCRIPT_DIR/fuz_scripts.sh"
 
 # FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
@@ -235,19 +235,21 @@ function _open_filematch() {
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
-      vim +":set mouse=a" +":silent! normal g;" \
+      vim \
+        +":set mouse=a" +":silent! normal g;" \
         +":set number nohlsearch" \
         +":set wrap linebreak nolist" \
         +":set textwidth=0 showbreak= colorcolumn= conceallevel=0 " \
         +":set clipboard^=unnamed,unnamedplus" \
-        +"${linematch:-0}" "$file"
+        +"${linematch:-0}" +"normal zt" \
+        "$file"
 
     else
       # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-      lineopen=$(( ${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0 ))
+      lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
       bat "$file" --color=always --style plain \
-      --highlight-line "${linematch:-0}" \
-      --pager="less -R +${lineopen:-0}g --ignore-case"
+        --highlight-line "${linematch:-0}" \
+        --pager="less -R +${lineopen:-0}g --ignore-case"
     fi
   fi
   exit 0
@@ -317,6 +319,7 @@ function main() {
   # fuz -e: Search filenames, open with vim
   # Uses ripgrep and fzf exact search.
   # FZF auto-selects if single match
+  # Bindings: Ctrl + E to open with vim, Ctrl + F to open with less
   if [[ $names == 1 ]]; then
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
@@ -325,6 +328,9 @@ function main() {
         2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
+          --header 'Press CTRL+F to view, CTRL-E to edit' \
+          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-f:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
           --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
@@ -336,6 +342,7 @@ function main() {
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
   # FZF shows file-content previews. Auto-selects if single match
   # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
+  # Bindings: Ctrl + E to open with vim, Ctrl + F to open with less
   else
     filematch=$(
       rg ".*[:alpha:]" --max-columns 250 --max-columns-preview \
@@ -346,7 +353,10 @@ function main() {
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "${fuzzysearch}" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --preview="source $STRING2ARG_FILE \
+          --header 'Press CTRL+F to view, CTRL-E to edit' \
+          --bind "ctrl-f:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --preview="source $FUZ_SCRIPTS_FILE \
         ; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 

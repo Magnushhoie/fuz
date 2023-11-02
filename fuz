@@ -11,15 +11,15 @@ if [[ ${TRACE-0} == "1" ]]; then
 fi
 
 # Script parameters
-SCRIPT_DIR="$(
+FUZ_SCRIPT_DIR="$(
   cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 >/dev/null
   pwd -P
 )"
-SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
-declare -r SCRIPT_DIR
-declare -r SCRIPT_PATH
-declare -r FUZ_SCRIPTS_FILE="$SCRIPT_DIR/fuz_scripts.sh"
-declare -r FUZ_SCRIPTS_FILE="$SCRIPT_DIR/fuz_scripts.sh"
+FUZ_SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
+declare FUZ_SCRIPT_DIR
+declare FUZ_SCRIPT_PATH
+declare FUZ_SCRIPTS_FILE="$FUZ_SCRIPT_DIR/fuz_scripts.sh"
+declare FUZ_SCRIPTS_FILE="$FUZ_SCRIPT_DIR/fuz_scripts.sh"
 
 # FZF GUI parameters
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --line-range :500 {}'"
@@ -168,14 +168,14 @@ ln -s /usr/bin/batcat ~/.local/bin/bat"""
 #######################################
 # Adds aliases fuz with new search path .bashrc/.zshrc
 # Globals:
-#   file: SCRIPT_PATH
+#   file: FUZ_SCRIPT_PATH
 # Arguments:
 #   None
 #######################################
 function add_aliases_zsh_bashrc() {
   # Set default search directory
-  read -rp $''"Set fuz search directory below (default $SCRIPT_DIR/notes/):"$'\n' search_directory
-  FUZ_DIR=$(realpath "${search_directory:-"$SCRIPT_DIR"/notes}")
+  read -rp $''"Set fuz search directory below (default $FUZ_SCRIPT_DIR/notes/):"$'\n' search_directory
+  FUZ_DIR=$(realpath "${search_directory:-"$FUZ_SCRIPT_DIR"/notes}")
   echo -e "New directory: $FUZ_DIR"
 
   # Continue?
@@ -186,7 +186,7 @@ function add_aliases_zsh_bashrc() {
 
   # Add aliases to .bashrc / .zshrc
   echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
-  LINE1="alias fuz='$SCRIPT_PATH --path \"$FUZ_DIR\"'"
+  LINE1="alias fuz='$FUZ_SCRIPT_PATH --path \"$FUZ_DIR\"'"
   LINE2="alias fz='fuz --sorttime'"
   LINE3="alias fze='fuz --edit'"
 

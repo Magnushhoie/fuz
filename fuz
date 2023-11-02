@@ -42,6 +42,12 @@ Default searches 5 directories down, follows symlinks and shows up to 50K lines 
 
 Project homepage: https://github.com/Magnushhoie/fuz
 
+KEY BINDINGS:
+  CTRL+E             Edit in vim
+  CTRL+F             View with less
+  CTRL+J             MOVE down
+  CTRL+K             MOVE up
+
 OPTIONS:
   --setup            Set fuz default search directory in .zsh/.bashrc
   -p, --path         Directory to search

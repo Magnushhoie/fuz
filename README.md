@@ -34,7 +34,7 @@ Why use Fuz?
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
-- Works well with Obsidian / Roam / Apple Notes like note-taking apps, searching your git repo and code snippets
+- Works well with Obsidian / Roam like note-taking apps, searching your git repo and code snippets
 
 ## Installation and usage
 

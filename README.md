@@ -32,6 +32,7 @@ Why use Fuz?
 - Fuz instantly and interactively returns search matches (see above)
 - Sorts results chronologically
 - Supports markdown and code highlighting
+- Key bindings for rapidly editing & browsing
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
 - Works well with Obsidian / Roam like note-taking apps, searching your git repo and code snippets

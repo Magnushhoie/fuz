@@ -42,7 +42,7 @@ function _fze_write() {
   linematch=${2:-0}
   if [[ -f $file ]]; then
     # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
-    vim \
+    ${EDITOR:-vim} \
       +":set mouse=a" +":silent! normal g;" \
       +":set number nohlsearch" \
       +":set wrap linebreak nolist" \
@@ -82,7 +82,7 @@ function _fz_write() {
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
     # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
-    vim \
+    ${EDITOR:-vim} \
       +":set mouse=a" +":silent! normal g;" \
       +":set number nohlsearch" \
       +":set wrap linebreak nolist" \

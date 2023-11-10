@@ -296,8 +296,10 @@ function main() {
 
     # Touch and open with system if --open flag, else use vim
     if [[ $edit -eq 1 ]]; then
+      mkdir -p "$(dirname "$file")"
       vim "$file"
     else
+      mkdir -p "$(dirname "$file")"
       touch "$file"
       open "$file"
     fi

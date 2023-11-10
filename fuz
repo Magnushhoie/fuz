@@ -293,9 +293,9 @@ function main() {
     fi
     file="$dir/$query"
 
-    # Ensure notes have valid note extension
-    if [[ -z ${NOTE_EXT} ]]; then
-      if ! [[ $file =~ .*\.(md|txt|rst|adoc|json|jsn|yaml|yml|MD|TXT|RST|ADOC|JSON|JSN|YAML|YML) ]]; then
+    # Ensure notes have valid note extension when NOTE_EXT is set
+    if ! [[ -z ${NOTE_EXT} ]]; then
+      if ! [[ ${file,,} =~ .*\.(md|txt|rst|adoc|json|jsn|yaml|yml)$ ]]; then
         file="${file%.*}.${NOTE_EXT#.}"
       fi
     fi

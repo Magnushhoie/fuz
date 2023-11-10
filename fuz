@@ -295,7 +295,7 @@ function main() {
 
     # Ensure notes have valid note extension
     if [[ -z ${NOTE_EXT} ]]; then
-      if ! [[ $file =~ .*\.(md|txt|rst|adoc|MD|TXT|RST|ADOC) ]]; then
+      if ! [[ $file =~ .*\.(md|txt|rst|adoc|json|jsn|yaml|yml|MD|TXT|RST|ADOC|JSON|JSN|YAML|YML) ]]; then
         file="${file%.*}.${NOTE_EXT#.}"
       fi
     fi

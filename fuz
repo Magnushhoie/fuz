@@ -292,6 +292,13 @@ function main() {
       die "No filename provided to --create [FILENAME]"
     fi
     file="$dir/$query"
+
+    # Ensure notes have valid note extension
+    if [[ -z ${NOTE_EXT} ]]; then
+      if ! [[ $file =~ .*\.(md|txt|rst|adoc|MD|TXT|RST|ADOC) ]]; then
+        file="${file%.*}.${NOTE_EXT#.}"
+      fi
+    fi
     msg "$dir/$file"
 
     # Touch and open with system if --open flag, else use vim

@@ -242,7 +242,7 @@ function _open_filematch() {
 
     if [[ $edit == 1 ]]; then
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
-      ${EDITOR:-vim} \
+      "${FUZ_EDITOR:-vim}" \
         +":set mouse=a" +":silent! normal g;" \
         +":set number nohlsearch" \
         +":set wrap linebreak nolist" \
@@ -296,8 +296,10 @@ function main() {
 
     # Touch and open with system if --open flag, else use vim
     if [[ $edit -eq 1 ]]; then
-      ${EDITOR:-vim} "$file"
+      mkdir -p "$(dirname "$file")"
+      "${FUZ_EDITOR:-vim}" "$file"
     else
+      mkdir -p "$(dirname "$file")"
       touch "$file"
       open "$file"
     fi

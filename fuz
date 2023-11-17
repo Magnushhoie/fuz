@@ -31,22 +31,36 @@ function usage() {
 USAGE:
   fuz [options] <FILENAME and/or SEARCH-TERMS>
 
-Fuz interactively fuzzy searches a directory and
-opens selected files at search result.
+Fuz interactively fuzzy searches a directory
+and opens selected files at search result.
 
 Use --edit to list files and edit in vim,
 or --open for system default app
 
-Skips large (1M+) or binary files, and hidden directories including .gitignore
-Default searches 5 directories down, follows symlinks and shows up to 50K lines per file.
-
 Project homepage: https://github.com/Magnushhoie/fuz
+
+EXAMPLES:
+- Search text from default path
+    fuz
+
+- Search specific path
+    fuz --path DIRECTORY
+
+- Search filenames to edit with vim:
+    fuz --edit
+
+- Open matches with system default text editor
+    fuz --open
 
 KEY BINDINGS:
   CTRL+O             Open in vim
   CTRL+L             View with less
   CTRL+J             MOVE down
   CTRL+K             MOVE up
+
+ALTERNATIVE TERMINAL EDITOR:
+  # add to .bashrc/.zshrc (currently supports neovim, macvim or vim):
+  export FUZ_EDITOR=nvim
 
 OPTIONS:
   --setup            Set fuz default search directory in .zsh/.bashrc
@@ -63,22 +77,6 @@ OPTIONS:
   --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
   -h, --help         Print this help and exit
-
-EXAMPLES:
-- Search text from default path
-    fuz
-
-- Search specific path
-    fuz --path DIRECTORY
-
-- Search filenames to edit with vim:
-    fuz --edit
-
-- Open matches with system default text editor
-    fuz --open
-
-- Chronologically sort results
-    fuz --sorttime
 
 EOF
   exit 0

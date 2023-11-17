@@ -84,9 +84,6 @@ opens selected files at search result.
 Use --edit to list files and edit in vim,
 or --open for system default app
 
-Skips large (1M+) or binary files, and hidden directories including .gitignore
-Default searches 5 directories down, follows symlinks and shows up to 50K lines per file.
-
 Project homepage: https://github.com/Magnushhoie/fuz
 
 

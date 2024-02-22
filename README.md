@@ -46,11 +46,12 @@ Why use Fuz?
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
 
-# 2. Run setup and point to a directory you want to fuz
+# 2. Run setup to set a default search directory
 ./fuz --setup
 
-# 3. Interactively search all files with fuz
+# 3. Interactively search default directory or path with fuz
 fuz
+fuz --path .
 ```
 
 ## Requirements (pick one option)

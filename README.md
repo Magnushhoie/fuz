@@ -30,9 +30,7 @@
 Why use Fuz?
 - Point to a directory of text files
 - Fuz instantly and interactively returns search matches (see above)
-- Sorts results chronologically
 - Supports markdown and code highlighting
-- Key bindings for rapidly editing & browsing
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
 - Works well with Obsidian / Roam like note-taking apps, searching your git repo and code snippets
@@ -124,7 +122,7 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
-  --sorttime         Sort files by date modified, preserve line order (single threaded, slow)
+  --sorttime         Sort chronologically, files by date modified, preserve line order (single threaded, slow)
   --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
   -h, --help         Print this help and exit

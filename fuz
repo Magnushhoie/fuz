@@ -352,7 +352,7 @@ function main() {
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
   else
     filematch=$(
-      rg ".*[:alpha:]" --max-columns 250 --max-columns-preview \
+      rg ".*\\p{L}" --max-columns 250 --max-columns-preview \
         --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" \
         ${rg_sort:-} \

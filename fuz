@@ -349,10 +349,11 @@ function main() {
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
   # FZF shows file-content previews. Auto-selects if single match
   # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
+  # rg search unicode letter \p{Letter}: https://docs.rs/regex/1.10.4/regex/#syntax
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
   else
     filematch=$(
-      rg ".*\\p{L}" --max-columns 250 --max-columns-preview \
+      rg ".*\p{Letter}" --max-columns 250 --max-columns-preview \
         --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" \
         ${rg_sort:-} \

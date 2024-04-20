@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Fuzzy search text / notes in the terminal. Blazingly fast, incremental searching and editing using fzf, ripgrep and vim. Used daily for 5+ years.
+    Blazingly fast, fuzzy text search and editing using fzf, ripgrep and vim. Personally used daily for over 6 years for managing notes
   </p>
 </p>
 

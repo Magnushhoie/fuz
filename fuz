@@ -73,6 +73,7 @@ OPTIONS:
   -m, --max-lines    Max lines read per file (50000)
   -s, --max-size     Max file-size to search (1M)
   -f, --fuzzy-search Enable fuzzy instead of exact search
+  --no-ignore        Search files ignored by .gitignore
   --sorttime         Sort files by date modified, preserve line order (single threaded, slow)
   --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
@@ -106,6 +107,7 @@ parse_params() {
   fuzzysearch='-e'    # f
   setup="0"           # setup
   dir="$(realpath .)" # p
+  rg_ignore=""        # default ripgrep ignores .gitignore
 
   while :; do
     case "${1-}" in
@@ -116,6 +118,7 @@ parse_params() {
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
       --dir) printdir='1' ;;
+      --no-ignore) rg_ignore='--no-ignore' ;;
       --vimsearch) edit='1' names='0' ;;
       --sorttime) rg_sort='--sortr modified' fzf_sort='--no-sort' ;;
       --setup) setup='1' ;;
@@ -132,7 +135,7 @@ parse_params() {
         shift
         ;;
       -p | --path)
-        dir="$(realpath "${2-}")"
+        dir="$(realpath "${2-.}")"
         shift
         ;;
       -?*) die "Unknown option: $1" ;;
@@ -331,7 +334,7 @@ function main() {
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
         --max-depth "$maxdepth" --max-filesize "$maxsize" \
-        ${rg_sort:-} \
+        ${rg_sort:-} ${rg_ignore:-} \
         2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
@@ -356,7 +359,7 @@ function main() {
       rg ".*\p{Letter}" --max-columns 250 --max-columns-preview \
         --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" \
-        ${rg_sort:-} \
+        ${rg_sort:-} ${rg_ignore:-} \
         2>/dev/null \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "${fuzzysearch}" --select-1 --query "${query-}" \

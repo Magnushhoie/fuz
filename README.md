@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Blazingly fast, fuzzy text search and editing using fzf, ripgrep and vim. Personally used daily for over 6 years for managing notes
+    Fuz is a blazingly fast, fuzzy text search and edit tool, based on fzf, ripgrep and vim. Personally used daily for over 6 years for managing notes
   </p>
 </p>
 

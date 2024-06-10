@@ -23,6 +23,7 @@ string2arg() {
 function _fze_read() {
   file=${1:-.""}
   linematch=${2:-0}
+  echo \"$(realpath "$file")\"
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
@@ -40,6 +41,7 @@ function _fze_read() {
 function _fze_write() {
   file=${1:-.""}
   linematch=${2:-0}
+  echo \"$(realpath "$file")\"
   if [[ -f $file ]]; then
     # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
     "${FUZ_EDITOR:-vim}" \
@@ -57,9 +59,11 @@ function _fz_read() {
   # Extract filename and linenumber from match
   dir="$1"
   filematch="$2"
+
   file=$(cut -d":" -f1 <<<"$filematch")
   file="$dir/$file"
   linematch=$(cut -d":" -f2 <<<"$filematch")
+  echo "$file:$linematch"
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
@@ -75,9 +79,11 @@ function _fz_write() {
   # Extract filename and linenumber from match
   dir="$1"
   filematch="$2"
+
   file=$(cut -d":" -f1 <<<"$filematch")
   file="$dir/$file"
   linematch=$(cut -d":" -f2 <<<"$filematch")
+  echo "$file:$linematch"
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then

@@ -196,10 +196,10 @@ function add_aliases_zsh_bashrc() {
 
   # Add aliases to .bashrc / .zshrc
   echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
-  LINE1="alias fuz='$FUZ_SCRIPT_PATH'"
-  LINE2="alias fz='fuz --sorttime --path \"$FUZ_DIR\"'"
-  LINE3="alias fze='fuz --edit --path \"$FUZ_DIR\"'"
-  LINE4="alias fzd='fuz --dir-search --path \"$FUZ_DIR\"'"
+  LINE1="alias fuz='$FUZ_SCRIPT_PATH --path \"$FUZ_DIR\"'"
+  LINE2="alias fz='fuz --sorttime'"
+  LINE3="alias fze='fuz --edit'"
+  LINE4="alias fzd='fuz --dir-search'"
 
   for LINE in "$LINE1" "$LINE2" "$LINE3" "$LINE4"; do
     echo "$LINE"
@@ -339,17 +339,16 @@ function main() {
         | cut -c 3- \
         | fzf --select-1 --query "${query-}" \
           --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
-          --bind "ctrl-o:execute(open {})" \
+          --bind "ctrl-o:execute(DIR={})+accept" \
           --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
           --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})" \
-          `# Preview dir contents` \
-          --preview="find {} -maxdepth 1 -not -path '*/.*' | tail -n +2" \
+          --bind "enter:execute(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
+          --preview="find {} -maxdepth 1 -not -path '*/.*' | tail -n +1" \
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     # If not empty
-    [[ -z $DIR ]] && exit 1
-    DIR=$(realpath "$DIR")
-    echo cd "$DIR"
-    cd "$DIR" && exec $SHELL || exit 1
+
+    exec "${BASH_SOURCE[0]}" --names -p "$DIR" || exit 1
+
     #echo cd "$DIR"
     #open "$DIR" || exit 1
     exit 0
@@ -359,6 +358,7 @@ function main() {
   # Uses ripgrep and fzf exact search.
   # FZF auto-selects if single match
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
+            # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
   if [[ $names == 1 ]]; then
     file=$(
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
@@ -367,11 +367,11 @@ function main() {
         2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open, K' \
+          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-o:execute(open {})" \
-          --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
+          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)+abort" \
           --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
@@ -385,6 +385,7 @@ function main() {
   # Hack: $fuzzysearch unquoted to allow for empty string (fzf breaks with "" as input)
   # rg search unicode letter \p{Letter}: https://docs.rs/regex/1.10.4/regex/#syntax
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
+          # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
   else
     filematch=$(
       rg ".*\p{Letter}" --max-columns 250 --max-columns-preview \
@@ -398,9 +399,10 @@ function main() {
           --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
-          --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-o:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)+abort" \
           --preview="source $FUZ_SCRIPTS_FILE \
-        ; cd \"$dir\"; string2arg \"$dir\"/{}"
+        ; cd \"$dir\"; string2arg \"$dir/\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
 
     # Extract filename and linenumber from match

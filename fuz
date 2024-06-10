@@ -196,11 +196,12 @@ function add_aliases_zsh_bashrc() {
 
   # Add aliases to .bashrc / .zshrc
   echo -e "\nAdding aliases to .bashrc and ~/.zshrc ..."
-  LINE1="alias fuz='$FUZ_SCRIPT_PATH --path \"$FUZ_DIR\"'"
-  LINE2="alias fz='fuz --sorttime'"
-  LINE3="alias fze='fuz --edit'"
+  LINE1="alias fuz='$FUZ_SCRIPT_PATH'"
+  LINE2="alias fz='fuz --sorttime --path \"$FUZ_DIR\"'"
+  LINE3="alias fze='fuz --edit --path \"$FUZ_DIR\"'"
+  LINE4="alias fzd='fuz --dir-search --path \"$FUZ_DIR\"'"
 
-  for LINE in "$LINE1" "$LINE2" "$LINE3"; do
+  for LINE in "$LINE1" "$LINE2" "$LINE3" "$LINE4"; do
     echo "$LINE"
     for FILE in "$HOME"/.bashrc "$HOME"/.zshrc; do
       if [[ -f "$FILE" ]]; then
@@ -339,11 +340,13 @@ function main() {
         | fzf --select-1 --query "${query-}" \
           --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
           --bind "ctrl-o:execute(open {})" \
-          --bind "ctrl-e:execute(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
-          --bind "ctrl-l:execute(exec \"${BASH_SOURCE[0]}\" -p {})" \
+          --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
+          --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})" \
           `# Preview dir contents` \
           --preview="find {} -maxdepth 1 -not -path '*/.*' | tail -n +2" \
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
+    # If not empty
+    [[ -z $DIR ]] && exit 1
     DIR=$(realpath "$DIR")
     echo cd "$DIR"
     cd "$DIR" && exec $SHELL || exit 1
@@ -364,11 +367,11 @@ function main() {
         2>/dev/null \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
+          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open, K' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-o:execute(open {})" \
-          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
+          --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
           --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
@@ -395,7 +398,7 @@ function main() {
           --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
-          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --preview="source $FUZ_SCRIPTS_FILE \
         ; cd \"$dir\"; string2arg \"$dir\"/{}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)

@@ -69,10 +69,11 @@ OPTIONS:
   -e, --edit         Open file with vim editor (instead of 'less'), enables --names option
   -n, --names        Only show filenames
   -c, --create       Create new file in search directory: --create <FILENAME>
-  -d, --max-depth    Max search depth (5)
-  -m, --max-lines    Max lines read per file (50000)
-  -s, --max-size     Max file-size to search (1M)
-  -f, --fuzzy-search Enable fuzzy instead of exact search
+  --max-depth        Max search depth (5)
+  --max-lines        Max lines read per file (50000)
+  --max-size         Max file-size to search (1M)
+  --fuzzy-search     Enable fuzzy instead of exact search
+  --directory-search Search directories
   --no-ignore        Search files ignored by .gitignore
   --sorttime         Sort files by date modified, preserve line order (single threaded, slow)
   --vimsearch        Search lines and open in vim
@@ -96,18 +97,19 @@ die() {
 
 parse_params() {
   # default values of variables set from params
-  edit='0'            # e
-  open_system='0'     # o
-  create_file='0'     # c
-  maxdepth='5'        # d
-  maxlines='50000'    # m
-  maxsize='1M'        # m
-  names='0'           # n
-  printdir='0'        # dir
-  fuzzysearch='-e'    # f
-  setup="0"           # setup
-  dir="$(realpath .)" # p
+  edit='0'            # --edit -e
+  open_system='0'     # --open -o
+  create_file='0'     # --create_file -c
+  maxdepth='5'        # --maxdepth
+  maxlines='50000'    # --maxlines
+  maxsize='1M'        # --maxsize
+  names='0'           # --names (n)
+  printdir='0'        # --dir
+  fuzzysearch='-e'    # --fuzzy-search -f
+  setup="0"           # --setup
+  dir="$(realpath .)" # --path -p
   rg_ignore=""        # default ripgrep ignores .gitignore
+  directorysearch=FALSE
 
   while :; do
     case "${1-}" in
@@ -117,6 +119,7 @@ parse_params() {
       -c | --create) create_file='1' ;;
       -n | --names) names='1' ;;
       -f | --fuzzy-search) fuzzysearch='' ;;
+      -d | --directory-search) directorysearch='TRUE' ;;
       --dir) printdir='1' ;;
       --no-ignore) rg_ignore='--no-ignore' ;;
       --vimsearch) edit='1' names='0' ;;
@@ -324,6 +327,26 @@ function main() {
     file=$(realpath "${files[0]}")
 
     _open_filematch
+  fi
+
+  # fuz -d: Search directories, cd to match
+  # Ignore hidden directories
+  if [[ $directorysearch == TRUE ]]; then
+    DIR=$(
+      find . -type d -not -path '*/.*' \
+      -mindepth 1 -maxdepth "$maxdepth" 2>/dev/null \
+        | cut -c 3- \
+        | fzf --select-1 --query "${query-}" \
+          --header 'Press CTRL+O to open' \
+          --bind "ctrl-o:execute(open {})" \
+          --preview="find {} -maxdepth 1 -not -path '*/.*'"
+    ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
+    DIR=$(realpath "$DIR")
+    echo cd "$DIR"
+    cd "$DIR" && exec $SHELL || exit 1
+    #echo cd "$DIR"
+    #open "$DIR" || exit 1
+    exit 0
   fi
 
   # fuz -e: Search filenames, open with vim

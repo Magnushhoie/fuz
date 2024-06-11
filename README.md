@@ -23,7 +23,7 @@
 </p>
 <p align="center">
 <a href="https://asciinema.org/a/540480" target="_blank">
-<img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz.gif?raw=true" width="500"/>
+<img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz2.gif?raw=true" width="500"/>
 </a>
 </p>
 

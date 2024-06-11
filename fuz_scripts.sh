@@ -98,3 +98,19 @@ function _fz_write() {
       "$file"
   fi
 }
+
+function _fz_open() {
+  # Extract filename and linenumber from match
+  dir="$1"
+  filematch="$2"
+
+  file=$(cut -d":" -f1 <<<"$filematch")
+  file="$dir/$file"
+  linematch=$(cut -d":" -f2 <<<"$filematch")
+  echo "$file:$linematch"
+
+  # If valid file, open with vim if edit (-e) flag, else less
+  if [[ -f $file ]]; then
+    open "$file"
+  fi
+}

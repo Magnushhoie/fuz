@@ -16,20 +16,20 @@
 </picture>
          ></h1>
   <p align="center">
-    Fuz is a blazingly fast searcher for folders, files and text. Personally used daily for over 6 years for managing notes
+    Fuz is a blazingly fast folder, file and text searcher. Personally used daily for over 6 years for managing notes
   </p>
 </p>
 
 </p>
 <p align="center">
-<a href="https://asciinema.org/a/540480" target="_blank">
-<img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz.gif?raw=true" width="500"/>
+<a href="https://asciinema.org/a/663578" target="_blank">
+<img src="https://github.com/Magnushhoie/fuz/blob/main/img/fuz2.gif?raw=true" width="500"/>
 </a>
 </p>
 
 Why use Fuz?
 - Point to any path containing folders, files or text
-- Fuz instantly and interactively returns search matches
+- Fuz instantly and interactively returns search matches (see above)
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories

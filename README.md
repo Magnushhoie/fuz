@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Fuz is a blazingly fast, fuzzy text search and edit tool, based on fzf, ripgrep and vim. Personally used daily for over 6 years for managing notes
+    Fuz is a blazingly fast searcher for folders, files and text. Personally used daily for over 6 years for managing notes
   </p>
 </p>
 
@@ -28,12 +28,12 @@
 </p>
 
 Why use Fuz?
-- Point to a directory of text files
-- Fuz instantly and interactively returns search matches (see above)
+- Point to any path containing folders, files or text
+- Fuz instantly and interactively returns search matches
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
-- Works well with Obsidian / Roam like note-taking apps, searching your git repo and code snippets
+- Search Github repo code, Obsidian notes, code-snippets or specific files in seconds
 
 ## Installation and usage
 

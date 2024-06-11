@@ -15,6 +15,7 @@ FUZ_SCRIPT_DIR="$(
   cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 >/dev/null
   pwd -P
 )"
+
 FUZ_SCRIPT_PATH="$(realpath "${BASH_SOURCE[0]}")"
 declare FUZ_SCRIPT_DIR
 declare FUZ_SCRIPT_PATH
@@ -332,22 +333,28 @@ function main() {
 
   # fuz -d: Search directories, cd to match
   # Ignore hidden directories
+  #        --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
+  #        --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})" \
   if [[ $directorysearch == TRUE ]]; then
     DIR=$(
-      find . -type d -not -path '*/.*' \
+      ( echo "$dir" && 
+        find . -type d -not -path '*/.*' \
       -mindepth 1 -maxdepth "$maxdepth" 2>/dev/null \
         | cut -c 3- \
+      ) \
         | fzf --select-1 --query "${query-}" \
-          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
+          --header-lines=1 \
+          --header "Folders. Ctrl+E edit, Ctrl+L view, Ctrl+F toggle" \
           --bind "ctrl-o:execute(DIR={})+accept" \
-          --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
-          --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})" \
-          --bind "enter:execute(exec \"${BASH_SOURCE[0]}\" --names -p {})" \
+          --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})+abort" \
+          --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})+abort" \
+          --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --names --path .)" \
+          --bind "enter:execute(exec \"${BASH_SOURCE[0]}\" --names --path {})" \
           --preview="find {} -maxdepth 1 -not -path '*/.*' | tail -n +1" \
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     # If not empty
 
-    exec "${BASH_SOURCE[0]}" --names -p "$DIR" || exit 1
+    # exec "${BASH_SOURCE[0]}" --names -p "$DIR" || exit 1
 
     #echo cd "$DIR"
     #open "$DIR" || exit 1
@@ -361,15 +368,19 @@ function main() {
             # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
   if [[ $names == 1 ]]; then
     file=$(
+      ( echo "$dir" && 
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
         --max-depth "$maxdepth" --max-filesize "$maxsize" \
         ${rg_sort:-} ${rg_ignore:-} \
         2>/dev/null \
+      ) \
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
+          --header-lines=1 \
+          --header 'Files: CTRL+E edit, CTRL+L view, Ctrl+O open, Ctrl+F toggle' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --path .)+abort" \
           --bind "ctrl-o:execute(open {})" \
           --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)+abort" \
           --preview="bat --color=always {}"
@@ -386,20 +397,25 @@ function main() {
   # rg search unicode letter \p{Letter}: https://docs.rs/regex/1.10.4/regex/#syntax
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
           # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          # --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --names --path .)" \
   else
     filematch=$(
+      ( echo "$dir" && 
       rg ".*\p{Letter}" --max-columns 250 --max-columns-preview \
         --color=always --no-heading --with-filename --line-number \
         --max-depth "$maxdepth" --max-filesize "$maxsize" --max-count "$maxlines" \
         ${rg_sort:-} ${rg_ignore:-} \
         2>/dev/null \
+      ) \
         | LC_ALL=C sed "s;$dir/;;" \
         | fzf "${fuzzysearch}" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
-          --header 'CTRL+E edit, CTRL+L view, Ctrl+O open' \
+          --header-lines=1 \
+          --header 'Contents: CTRL+E edit, CTRL+L view, Ctrl+O open, Ctrl+F toggle' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-o:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --dir-search --path .)+abort" \
           --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)+abort" \
           --preview="source $FUZ_SCRIPTS_FILE \
         ; cd \"$dir\"; string2arg \"$dir/\"/{}"

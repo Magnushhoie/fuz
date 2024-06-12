@@ -33,7 +33,7 @@ Why use Fuz?
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results
 - Cleverly ignores large binary files and hidden directories
-- Search Github repo code, Obsidian notes, code-snippets or specific files in seconds
+- Search Github repo code, Obsidian notes or code-snippets in the terminal in seconds
 
 ## Installation and usage
 

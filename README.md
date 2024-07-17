@@ -64,7 +64,7 @@ conda install -c conda-forge fzf ripgrep bat
 # C) Linux/Ubuntu (requires sudo):
 sudo apt-get install fzf ripgrep bat
 # You should alias batcat to bat
-mkdir -p ~/.local/bin # Alias batcat to bat
+mkdir -p ~/.local/bin
 ln -s /usr/bin/batcat ~/.local/bin/bat
 # Alternatively:
 sudo ln -s /usr/bin/batcat usr/local/bin/bat

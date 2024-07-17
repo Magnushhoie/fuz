@@ -58,15 +58,13 @@ fuz --path .
 # A) MacOS: First install brew (https://brew.sh/) then run
 brew install fzf rg bat
 
-# B) Any system: Use conda https://conda.io/docs/user-guide/install/
-conda install -c conda-forge fzf ripgrep bat 
+# B) Linux/Ubuntu (requires sudo):
+sudo apt-get install fzf ripgrep bat
+mkdir -p ~/.local/bin # Alias batcat to bat
+ln -s /usr/bin/batcat ~/.local/bin/bat 
 
-# C) Linux/Ubuntu (requires sudo):
-sudo apt-get install fzf ripgrep
-sudo apt install bat
-# Batcat should be aliased to bat to work with fuz
-mkdir -p ~/.local/bin
-ln -s /usr/bin/batcat ~/.local/bin/bat
+# C) Any system: Use conda https://conda.io/docs/user-guide/install/
+conda install -c conda-forge fzf ripgrep bat 
 ```
 
 - [fzf](https://github.com/junegunn/fzf)

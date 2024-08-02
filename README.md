@@ -37,17 +37,17 @@ Why use Fuz?
 
 ## Installation and usage
 
-```bash
-# 0. Install requirements (see below)
+Step 1: Install requirements (see below)
 
-# 1. Download and install Fuz
+Step 2: Download and install Fuz
+```bash
 git clone https://github.com/Magnushhoie/fuz/
 cd fuz && chmod +x fuz
-
-# 2. Run setup to set a default search directory
 ./fuz --setup
+```
 
-# 3. Interactively search default directory or path with fuz
+Step 3: Search any path. Use Ctrl + F to toggle search mode.
+```bash
 fuz
 fuz --path .
 ```

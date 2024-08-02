@@ -55,7 +55,7 @@ fuz --path .
 ## Requirements (pick one option)
 
 ```bash
-# A) MacOS: First install brew (https://brew.sh/) then run
+# A) MacOS, with brew (https://brew.sh/)
 brew install fzf rg bat
 
 # B) Any system: Use conda https://conda.io/docs/user-guide/install/

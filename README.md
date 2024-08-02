@@ -16,7 +16,7 @@
 </picture>
          ></h1>
   <p align="center">
-    Fuz is a blazingly fast folder, file and text searcher. Personally used daily for over 6 years for managing notes
+    Fuz is a blazingly fast text, file and folder search tool. Personally used daily for over 6 years for managing notes
   </p>
 </p>
 

@@ -28,7 +28,7 @@
 </p>
 
 Why use Fuz?
-- Point to any path containing folders, files or text
+- Point to any path containing text, files or folders
 - Fuz instantly and interactively returns search matches (see above)
 - Supports markdown and code highlighting
 - File contents are memory mapped for faster results

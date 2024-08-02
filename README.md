@@ -62,10 +62,12 @@ brew install fzf rg bat
 conda install -c conda-forge fzf ripgrep bat
 
 # C) Linux/Ubuntu (requires sudo):
-sudo apt-get install fzf ripgrep bat
-# You should alias batcat to bat
+# Install FZF from Github
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+# Install remaining, symlink batcat to bat
+sudo apt-get install ripgrep bat
 mkdir -p ~/.local/bin
-ln -s /usr/bin/batcat ~/.local/bin/bat
 # Alternatively:
 sudo ln -s /usr/bin/batcat usr/local/bin/bat
 ```

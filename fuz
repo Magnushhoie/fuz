@@ -368,8 +368,14 @@ function main() {
   # Uses ripgrep and fzf exact search.
   # FZF auto-selects if single match
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less
-            # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
+  # --bind "enter:become(source $FUZ_SCRIPTS_FILE && _fuz_write "{}" < /dev/tty > /dev/tty)" \
   if [[ $names == 1 ]]; then
+
+    FUZ_ENTER_MODE="_fuz_read"
+    if [[ $edit == 1 ]]; then
+      FUZ_ENTER_MODE="_fuz_write"
+    fi
+
     file=$(
       ( echo "$dir" &&
       rg "^" --max-columns 250 --max-columns-preview --files-with-matches \
@@ -381,19 +387,19 @@ function main() {
           ${fzf_sort:-} \
           --header-lines=1 \
           --header 'Files: CTRL+E edit, CTRL+L view, Ctrl+O open, Ctrl+F toggle' \
-          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)" \
-          --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fze_read "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fuz_write "{}" < /dev/tty > /dev/tty)" \
+          --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fuz_read "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --path .)+abort" \
           --bind "ctrl-i:become(exec \"${BASH_SOURCE[0]}\" --dir-search --path .)" \
           --bind "ctrl-u:become(exec \"${BASH_SOURCE[0]}\" --dir-search --path ../)" \
           --bind "ctrl-o:execute(open {})" \
-          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && _fze_write "{}" < /dev/tty > /dev/tty)+abort" \
+          --bind "enter:execute(source $FUZ_SCRIPTS_FILE && $FUZ_ENTER_MODE "{}" < /dev/tty > /dev/tty)+abort" \
           --preview="bat --color=always {}"
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
 
     # Open with vim or less
-    _open_filematch
+    # _open_filematch
 
   # fuz: Search file-contents, open with less
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git

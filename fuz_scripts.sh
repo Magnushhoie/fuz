@@ -20,7 +20,7 @@ string2arg() {
 # Ctrl + E: Vim edit
 # file="$dir/$file"
 # Input: $file, $linematch
-function _fze_read() {
+function _fuz_read() {
   file=${1:-.""}
   linematch=${2:-0}
   echo \"$(realpath "$file")\"
@@ -38,7 +38,7 @@ function _fze_read() {
 # Ctrl + F: Less preview
 # file="$dir/$file"
 # Input: $file, $linematch
-function _fze_write() {
+function _fuz_write() {
   file=${1:-.""}
   linematch=${2:-0}
   echo \"$(realpath "$file")\"

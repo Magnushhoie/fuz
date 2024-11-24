@@ -312,17 +312,22 @@ function main() {
     exit 0
   fi
 
-  # fuz [filename]: If only 1 file is found (n=2 levels down), open file
-  # Find files matching [filename], 2 levels deep, stop after 2nd match
+  # fuz [filename]: Open file directly if query matches first part of basename
+  files=()
+  while IFS= read -r -d $'\0' file; do
+    filename="${file##*/}"
+    basename="${filename%.*}"
+
+  # Check for partial match with ~
+  if [[ "$basename" =~ ^"$query" ]]; then
+      files+=("$file")
+    fi
+  # Search 2 levels down
   # Null terminator trick for handling filepaths with whitespaces
   # https://unix.stackexchange.com/questions/75186/how-to-do-head-and-tail-on-null-delimited-input-in-bash
-  files=()
-  while read -r -d $'\0'; do
-    files+=("$REPLY")
   done < <(
-    find . -iname "*$query*" -maxdepth "$maxdepth" -print0 2>/dev/null \
-      | tr '\0\n' '\n\0' | head -n 2 | tr '\0\n' '\n\0'
-  ) || exit 1
+    find . -maxdepth 2 -type f -print0 2>/dev/null
+  )
 
   # If found single match, open file.
   if [[ ${#files[@]} -eq 1 ]]; then
@@ -365,6 +370,7 @@ function main() {
   fi
 
   # fuz -e: Search filenames, open with vim
+  # fuz --names: Search filenames, open with vim
   # Uses ripgrep and fzf exact search.
   # FZF auto-selects if single match
   # Bindings: Ctrl + E to edit with vim, Ctrl + L to open with less

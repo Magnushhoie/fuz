@@ -250,7 +250,7 @@ function _open_filematch() {
 
     if [[ $edit == 1 ]]; then
     
-      if [[ $FUZ_EDITOR == "nano" ]]; then
+      if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
         nano "$file"
         exit 0
       fi

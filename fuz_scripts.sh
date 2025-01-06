@@ -44,7 +44,7 @@ function _fuz_write() {
   echo \"$(realpath "$file")\"
   if [[ -f $file ]]; then
 
-    if [[ $FUZ_EDITOR == "nano" ]]; then
+    if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
       nano "$file"
       exit 0
     fi
@@ -94,7 +94,7 @@ function _fz_write() {
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
 
-    if [[ $FUZ_EDITOR == "nano" ]]; then
+    if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
       nano "$file"
       exit 0
     fi

@@ -247,6 +247,12 @@ function _open_filematch() {
   if [[ -f $file ]]; then
 
     if [[ $edit == 1 ]]; then
+    
+      if [[ $FUZ_EDITOR == "nano" ]]; then
+        nano "$file"
+        exit 0
+      fi
+
       # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
       "${FUZ_EDITOR:-vim}" \
         +":set mouse=a" +":silent! normal g;" \

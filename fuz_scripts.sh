@@ -43,6 +43,12 @@ function _fuz_write() {
   linematch=${2:-0}
   echo \"$(realpath "$file")\"
   if [[ -f $file ]]; then
+
+    if [[ $FUZ_EDITOR == "nano" ]]; then
+      nano "$file"
+      exit 0
+    fi
+
     # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
     "${FUZ_EDITOR:-vim}" \
       +":set mouse=a" +":silent! normal g;" \
@@ -87,6 +93,12 @@ function _fz_write() {
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
+
+    if [[ $FUZ_EDITOR == "nano" ]]; then
+      nano "$file"
+      exit 0
+    fi
+
     # Vim mouse-mode, start at top, softwrap, no numbering/highlight, clipboard copy-paste
     "${FUZ_EDITOR:-vim}" \
       +":set mouse=a" +":silent! normal g;" \

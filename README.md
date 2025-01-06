@@ -94,6 +94,8 @@ opens selected files at search result.
 Use --edit to list files and edit in vim,
 or --open for system default app
 
+Run 'export FUZ_EDITOR=nano' to use nano instead.
+
 Project homepage: https://github.com/Magnushhoie/fuz
 
 
@@ -135,6 +137,12 @@ OPTIONS:
   --vimsearch        Search lines and open in vim
   --dir              Print and open search directory
   -h, --help         Print this help and exit
+```
+
+## Use different editor
+Currently only supports vim (nvim etc) and nano. Pull requests welcome.
+```
+export FUZ_EDITOR=nano
 ```
 
 ## Search your Apple Notes (MacOSX)

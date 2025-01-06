@@ -359,6 +359,7 @@ function main() {
         | fzf --query "${query-}" \
           --header-lines=1 \
           --header "Folders: Ctrl+U up, Ctrl+I in, Ctrl+O open, Ctrl+F toggle, " \
+          --preview-window wrap \
           --bind "ctrl-e:become(exec \"${BASH_SOURCE[0]}\" --names -p {})+abort" \
           --bind "ctrl-l:become(exec \"${BASH_SOURCE[0]}\" -p {})+abort" \
           --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --names --path .)" \
@@ -400,6 +401,7 @@ function main() {
         | fzf "$fuzzysearch" --select-1 --query "${query-}" \
           ${fzf_sort:-} \
           --header-lines=1 \
+          --preview-window wrap \
           --header 'Files: CTRL+E edit, CTRL+L view, Ctrl+O open, Ctrl+F toggle' \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fuz_write "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fuz_read "{}" < /dev/tty > /dev/tty)" \
@@ -437,6 +439,7 @@ function main() {
           ${fzf_sort:-} \
           --header-lines=1 \
           --header 'Text: CTRL+E edit, CTRL+L view, Ctrl+O open, Ctrl+F toggle' \
+          --preview-window wrap \
           --bind "ctrl-e:execute(source $FUZ_SCRIPTS_FILE && _fz_write \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-l:execute(source $FUZ_SCRIPTS_FILE && _fz_read \"$dir\" "{}" < /dev/tty > /dev/tty)" \
           --bind "ctrl-f:become(exec \"${BASH_SOURCE[0]}\" --dir-search --path .)+abort" \

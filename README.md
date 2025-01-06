@@ -119,8 +119,8 @@ KEY BINDINGS:
   CTRL+K             MOVE up
 
 ALTERNATIVE TERMINAL EDITOR:
-# add to .bashrc/.zshrc (currently supports neovim, macvim or vim):
-export FUZ_EDITOR=nvim
+# add to .bashrc/.zshrc (currently supports nano, neovim, macvim or vim):
+export FUZ_EDITOR=nano
 
 OPTIONS:
   --setup            Set fuz default search directory in .zsh/.bashrc

@@ -251,7 +251,8 @@ function _open_filematch() {
     if [[ $edit == 1 ]]; then
     
       if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
-        nano "$file"
+        lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
+        nano +"${lineopen}" "$file"
         exit 0
       fi
 

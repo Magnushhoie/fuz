@@ -41,11 +41,13 @@ function _fuz_read() {
 function _fuz_write() {
   file=${1:-.""}
   linematch=${2:-0}
+  lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
+
   echo \"$(realpath "$file")\"
   if [[ -f $file ]]; then
 
     if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
-      nano "$file"
+      nano +"${lineopen}" "$file"
       exit 0
     fi
 
@@ -65,6 +67,7 @@ function _fz_read() {
   # Extract filename and linenumber from match
   dir="$1"
   filematch="$2"
+  lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
 
   file=$(cut -d":" -f1 <<<"$filematch")
   file="$dir/$file"
@@ -74,7 +77,6 @@ function _fz_read() {
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
     # Less w/ colors, highlight match, insensitive+incremental search, enable CTRL+C
-    lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
     bat "$file" --color=always --style plain \
       --highlight-line "${linematch:-0}" \
       --pager="less -R +${lineopen:-0}g --ignore-case"
@@ -89,13 +91,14 @@ function _fz_write() {
   file=$(cut -d":" -f1 <<<"$filematch")
   file="$dir/$file"
   linematch=$(cut -d":" -f2 <<<"$filematch")
+  lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
   echo "$file:$linematch"
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
 
     if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
-      nano "$file"
+      nano +"${lineopen}" "$file"
       exit 0
     fi
 

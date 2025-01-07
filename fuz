@@ -217,7 +217,7 @@ function add_aliases_zsh_bashrc() {
 }
 
 #######################################
-# Open file with less or vim (-e) at selected linenumber
+# Nb: Only used when a single file is found. Check fuz_scripts.sh for other edit/view functions!
 # Globals:
 #   file: File fullpath
 #   linematch: Line number
@@ -226,7 +226,7 @@ function add_aliases_zsh_bashrc() {
 # Arguments:
 #   None
 #######################################
-function _open_filematch() {
+function _special_open_1_file_found() {
 
   # Return file with filenumber (can copy-paste open at line with vim)
   msg "\"$file\"" "+${linematch:-0}"
@@ -248,6 +248,7 @@ function _open_filematch() {
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
 
+    # Nb: This code is rarely run. Please see fuz_scripts.sh for normally run edit/view code.
     if [[ $edit == 1 ]]; then
     
       if [[ "${FUZ_EDITOR:-vim}" == "nano" ]]; then
@@ -342,7 +343,7 @@ function main() {
   if [[ ${#files[@]} -eq 1 ]]; then
     file=$(realpath "${files[0]}")
 
-    _open_filematch
+    _special_open_1_file_found
   fi
 
   # fuz -d: Search directories, cd to match
@@ -415,8 +416,6 @@ function main() {
     ) || if [[ $? -eq 130 ]]; then exit 1; fi # Exit if Ctrl + C (FZF error code 130)
     file="$dir/$file"
 
-    # Open with vim or less
-    # _open_filematch
 
   # fuz: Search file-contents, open with less
   # Uses ripgrep with line numbers + filenames. Ignores binary files and .git
@@ -458,7 +457,7 @@ function main() {
     linematch=$(cut -d":" -f2 <<<"$filematch")
 
     # Open with vim or less
-    _open_filematch
+    _special_open_1_file_found
   fi
 
   exit 0

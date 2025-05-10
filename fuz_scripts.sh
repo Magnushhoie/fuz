@@ -67,12 +67,12 @@ function _fz_read() {
   # Extract filename and linenumber from match
   dir="$1"
   filematch="$2"
-  lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
-
   file=$(cut -d":" -f1 <<<"$filematch")
   file="$dir/$file"
   linematch=$(cut -d":" -f2 <<<"$filematch")
+  lineopen=$((${linematch:-0} >= 1 ? ${linematch:-0} - 1 : 0))
   echo "$file:$linematch"
+  
 
   # If valid file, open with vim if edit (-e) flag, else less
   if [[ -f $file ]]; then
